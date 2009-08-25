@@ -1,6 +1,6 @@
 --- Telescope is a test library for Lua that allows for flexible, declarative tests.
--- For information on usage, please see the included example.lua file. To see a sample
--- of how to run Telescope specs, see the included ts file.
+-- For information, please visit the project homepage at:
+-- <a href="http://telescope.luaforge.net/">http://telescope.luaforge.net</a>.
 -- @release 0.1
 module('telescope', package.seeall)
 
@@ -262,8 +262,13 @@ end
 -- <li>fail - will be invoked after each failing test</li>
 -- <li>pass - will be invoked after each passing test</li>
 -- <li>pending - will be invoked after each pending test</li>
--- <li>unassertive - will be invoked after each test which doesn't assert anything</li>
+-- <li>unassertive - will be invoked after each test which doesn't assert
+-- anything</li>
 -- </ul>
+-- <p>
+-- Callbacks could be used, for example, to drop into a debugger upon a failed
+-- expectation or error, for profiling, or updating a GUI progress meter.
+-- </p>
 -- @return A table with the following fields:
 -- <ul>
 -- <li>assertions - assertion count</li>
