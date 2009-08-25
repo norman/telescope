@@ -52,6 +52,38 @@ Or perhaps
 
     ts test/*.lua
 
+The standard test output from the examples given would be:
+
+
+    PPPUUUUU
+    --------------------------------------------------------------------------------
+    A context:
+    A nested context:
+      A test                                                                     [P]
+      Another nested context:
+        Another test                                                             [P]
+    A test in the top-level context                                              [P]
+    --------------------------------------------------------------------------------
+    A test with no context                                                       [U]
+    --------------------------------------------------------------------------------
+    Another test with no context                                                 [U]
+    --------------------------------------------------------------------------------
+    This is a context:
+    This is another context:
+      this is a test                                                             [U]
+      this is another test                                                       [U]
+      this is another test                                                       [U]
+    --------------------------------------------------------------------------------
+    8 tests, 3 assertions, 3 passed, 0 failed, 0 errors, 0 pending, 5 unassertive
+
+Telescope tells you which tests were run, how many assertions they called,
+how many passed, how many failed, how many produced errors, how many provided
+a name but no implementation, and how many didn't assert anything. In the event
+of any errors, it shows you stack traces.
+
+You can customize the test output to be as verbose or silent as you want, and easily
+write your own test reporters - the source is well documented.
+
 A more robust command-line tool is under development.
 
 ### More Examples ###
