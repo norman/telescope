@@ -152,27 +152,6 @@ local function truncate_string(s, len, after)
   end
 end
 
--- This is used to avoid contaminating the global environment. This is not
--- usually too large a concern for testing libraries, but in the event
--- telescope is used in a continuous integration server, it could be important.
-local function copy_global_env()
-  local lookup_table = {}
-  local function _copy(object)
-    if type(object) ~= "table" then
-      return object
-    elseif lookup_table[object] then
-      return lookup_table[object]
-    end
-    local new_table = {}
-    lookup_table[object] = new_table
-    for index, value in pairs(object) do
-      new_table[_copy(index)] = _copy(value)
-    end
-    return new_table
-  end
-  return _copy(_G)
-end
-
 make_assertion("nil",          "'%s' to be nil",                           function(a) return a == nil end)
 make_assertion("blank",        "'%s' to be blank",                         function(a) return a == '' or a == nil end)
 make_assertion("empty",        "'%s' to be an empty table",                function(a) return not next(a) end)
@@ -212,7 +191,7 @@ make_assertion("lte",          "'%s' to be less than or equal to '%s'",    funct
 -- </p>
 function load_contexts(path, contexts)
 
-  local env = copy_global_env()
+  local env = getfenv()
   local current_context = contexts or {}
 
   local function context_block(name, func)
@@ -295,7 +274,7 @@ function run(contexts, callbacks)
     contexts     = contexts
   }
 
-  local env = copy_global_env()
+  local env = getfenv()
   local status_names = invert_table(status_codes)
 
   env.assertion_callback = function()
