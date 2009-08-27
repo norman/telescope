@@ -42,7 +42,48 @@ end
 
 local function show_usage()
   local text = [[
-This will be the usage text for ts.
+Telescope v 0.1
+
+Usage: ts [options] [files]
+
+Description:
+  Telescope is a test framework for Lua that allows you to write tests
+  and specs in a TDD or BDD style.
+
+Options:
+
+  -f,     --format=full     Show full report format
+  -h,-?   --help            Show this text
+
+An example test:
+
+context("A context", function()
+  before(function() end)
+  after(function() end)
+  context("A nested context", function()
+    test("A test", function()
+      assert_not_equal("ham", "cheese")
+    end)
+    context("Another nested context", function()
+      test("Another test", function()
+        assert_greater_than(2, 1)
+      end)
+    end)
+  end)
+  test("A test in the top-level context", function()
+    assert_equal(1, 1)
+  end)
+end)
+
+Project home:
+  http://telescope.luaforge.net/
+
+License:
+  MIT/X11 (Same as Lua)
+
+Author:
+  Norman Clarke <norman@njclarke.com>. Please feel free to email bug
+  reports, feedback and feature requests.
 ]]
   print(text)
 end
@@ -60,15 +101,14 @@ end
 
 local function process_args()
   local files = {}
-  local opts = getopt(arg)
+  local opts = getopt(arg, "")
   local i = 1
   for _, _ in pairs(opts) do i = i+1 end
   while i <= #arg do table.insert(files, arg[i]) ; i = i + 1 end
   return opts, files
 end
-
 local opts, files = process_args()
-if not (next(opts) or next(files)) then
+if opts["h"] or opts["?"] or opts["help"] or not (next(opts) or next(files)) then
   show_usage()
   os.exit()
 end
@@ -90,13 +130,15 @@ end
 local results = telescope.run(contexts, callbacks)
 local buffer = {}
 
-if opts.format == "full" then
-  table.insert(buffer, telescope.test_report(results))
-  table.insert(buffer, telescope.summary_report(results))
-  table.insert(buffer, telescope.error_report(results))
+if opts.format == "full" or opts.f then
+  table.insert(buffer, telescope.test_report(contexts, results))
+  table.insert(buffer, telescope.summary_report(contexts, results))
+  table.insert(buffer, "")
+  table.insert(buffer, telescope.error_report(contexts, results))
 else
-  table.insert(buffer, telescope.summary_report(results))
-  table.insert(buffer, telescope.error_report(results))
+  table.insert(buffer, telescope.summary_report(contexts, results))
+  table.insert(buffer, "")
+  table.insert(buffer, telescope.error_report(contexts, results))
 end
 
 print(table.concat(buffer, "\n"))

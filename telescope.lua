@@ -366,7 +366,7 @@ function test_report(contexts, results)
   local level                = 0
   local previous_level       = 0
   local buffer               = {}
-  local width                = 80
+  local width                = 72
   local status_format        = "[%s]"
   local status_format_len    = 3
   local context_name_format  = "%-" .. width - status_format_len .. "s"
@@ -403,28 +403,46 @@ function test_report(contexts, results)
 end
 
 --- Show stack traces for tests which produced a failure or an error.
-function error_report(results)
+function error_report(contexts, results)
   local buffer = {}
-  function report_on_context(c)
-    for i, v in ipairs(c) do
-      local name = v.name
-      if v.context then -- output a context label
-        report_on_context(v.context)
-      elseif v.message then -- this is a test with an error
-        table.insert(buffer, v.name .. ":\n" .. v.message[1] .. "\n" .. v.message[2])
-      end
-    end
+  for _, r in filter(results, function(i, r) return r.status_code == status_codes.err end) do
+    local name = contexts[r.test].name
+    table.insert(buffer, name .. ":\n" .. r.message[1] .. "\n" .. r.message[2])
   end
-  report_on_context(results.contexts)
   return table.concat(buffer, "\n")
 end
 
 --- Show a one-line report with the status counts. The counts given are: total
 -- tests, assertions, passed tests, failed tests, pending tests, and tests which
 -- didn't assert anything.
-function summary_report(results)
-  return string.format(
-    "%d tests, %d assertions, %d passed, %d failed, %d errors, %d pending, %d unassertive",
-    results.tests, results.assertions, results.passes, results.failures,
-    results.errors, results.pendings, results.unassertives)
+function summary_report(contexts, results)
+  local r = {
+    assertions  = 0,
+    errors      = 0,
+    failed      = 0,
+    passed      = 0,
+    pending     = 0,
+    tests       = 0,
+    unassertive = 0
+  }
+  for _, v in pairs(results) do
+    r.tests = r.tests + 1
+    r.assertions = r.assertions + v.assertions_invoked
+    if v.status_code == status_codes.err then r.errors = r.errors + 1
+    elseif v.status_code == status_codes.fail then r.failed = r.failed + 1
+    elseif v.status_code == status_codes.pass then r.passed = r.passed + 1
+    elseif v.status_code == status_codes.pending then r.pending = r.pending + 1
+    elseif v.status_code == status_codes.unassertive then r.unassertive = r.unassertive + 1
+    end
+  end
+  local buffer = {}
+  for _, k in ipairs({"tests", "passed", "assertions", "failed", "errors", "unassertive", "pending"}) do
+    local number = r[k]
+    local label = k
+    if number == 1 then
+      label = string.gsub(label, "s$", "")
+    end
+    table.insert(buffer, string.format("%d %s", number, label))
+  end
+  return table.concat(buffer, " ")
 end
