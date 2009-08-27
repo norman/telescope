@@ -2,6 +2,8 @@
 
 -- 1. Contexts and nested contexts
 context("A context", function()
+  before(function() end)
+  after(function() end)
   context("A nested context", function()
     test("A test", function()
       assert_not_equal("ham", "cheese")
@@ -16,6 +18,7 @@ context("A context", function()
     assert_equal(1, 1)
   end)
 end)
+
 
 -- 2. Tests with no context.
 test("A test with no context", function()
@@ -33,6 +36,7 @@ spec("This is a context", function()
     expect("this is another test", function()
     end)
     should("this is another test", function()
+      error("Drat!")
     end)
   end)
 end)

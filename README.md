@@ -28,18 +28,14 @@ being only about 250 lines of code.
 Telescope is in early beta, but is usable. I am using it for several
 personal projects.
 
-Clone the [Git repository](http://github.com/norman/telescope) and
-install using Luarocks:
+You can use Luarocks to install the latest release from the [git repository](http://github.com/norman/telescope):
 
-    $ git clone git://github.com/norman/telescope.git
-    $ cd telescope
-    $ sudo luarocks make telescope-*.rockspec
+    sudo luarocks build telescope --from=http://luarocks.luaforge.net/rocks-cvs/
 
-A more "official" Luarocks installation will be ready soon.
+If you want to work on the source code, you can clone the git repository from:
 
-Alternatively, since Telescope fits in one file, you can simply
-copy telescope.lua into your project, and create your own spec
-runner script, using the ts script as a model.
+    git://github.com/norman/telescope.git
+
 
 ## Running your tests ##
 
@@ -129,10 +125,6 @@ A more robust command-line tool is under development.
      after = function(t) io.stdout:write(t.status_label) end,
      error = function(t) debug.debug() end
     })
-
-## Bugs ##
-
-There is no support for before/after functions yet.
 
 ## Author ##
 
