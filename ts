@@ -155,7 +155,10 @@ if not opts.s and not opts.silent then
   table.insert(buffer, summary)
   if not opts.q and not opts.quiet then
     local report = telescope.error_report(contexts, results)
-    if report then table.insert(buffer, report) end
+    if report then
+      table.insert(buffer, "")
+      table.insert(buffer, report)
+    end
   end
 end
 

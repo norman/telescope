@@ -47,9 +47,9 @@ called "ts", which is installed by Luarocks. Simply run:
 
 Or perhaps
 
-    ts test/*.lua
+    ts -f test/*.lua
 
-The standard full test output from the examples given would be:
+The full test output (what you get using "-f") from the examples given would be:
 
     ------------------------------------------------------------------------
     A context:
@@ -73,14 +73,13 @@ The standard full test output from the examples given would be:
     A test in the top-level context:
     Assert failed: expected '3' to be equal to '1'
     stack traceback:
-      ./telescope.lua:128: in function 'assert_equal'
+      ...ib/luarocks/rocks//telescope/scm-1/lua/telescope.lua:139: in function 'assert_equal'
       example.lua:18: in function <example.lua:17>
       [C]: in function 'pcall'
-      ./telescope.lua:322: in function 'invoke_test'
-      ./telescope.lua:346: in function 'run'
-      ./ts:129: in main chunk
+      ...ib/luarocks/rocks//telescope/scm-1/lua/telescope.lua:330: in function 'invoke_test'
+      ...ib/luarocks/rocks//telescope/scm-1/lua/telescope.lua:362: in function 'run'
+      ...usr/local/lib/luarocks/rocks//telescope/scm-1/bin/ts:147: in main chunk
       [C]: ?
-
 
 Telescope tells you which tests were run, how many assertions they called,
 how many passed, how many failed, how many produced errors, how many provided
@@ -90,7 +89,11 @@ of any failures or errors, it shows you stack traces.
 You can customize the test output to be as verbose or silent as you want, and easily
 write your own test reporters - the source is well documented.
 
-You can see all the available command-line options by running
+You can pass in snippets of Lua code on the command line to run as callbacks for
+various test success/failure scenarios, and easily customize the output or use
+Telescope with other applications.
+
+You can see all the available command-line options, and some examples by running:
 
     ts -h
 
@@ -137,6 +140,9 @@ You can see all the available command-line options by running
      after = function(t) io.stdout:write(t.status_label) end,
      error = function(t) debug.debug() end
     })
+
+    -- call "ts" on the command line with a callback to generate a custom report
+    ts --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
 
 ## Author ##
 

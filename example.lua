@@ -15,7 +15,7 @@ context("A context", function()
     end)
   end)
   test("A test in the top-level context", function()
-    assert_equal(1, 1)
+    assert_equal(3, 1)
   end)
 end)
 
