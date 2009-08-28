@@ -6,8 +6,9 @@ being only about 250 lines of code.
 
 ## An Example ##
 
-    require 'telescope'
     context("A context", function()
+      before(function() end)
+      after(function() end)
       context("A nested context", function()
         test("A test", function()
           assert_not_equal("ham", "cheese")
@@ -19,7 +20,7 @@ being only about 250 lines of code.
         end)
       end)
       test("A test in the top-level context", function()
-        assert_equal(1, 1)
+        assert_equal(3, 1)
       end)
     end)
 
@@ -48,39 +49,50 @@ Or perhaps
 
     ts test/*.lua
 
-The standard test output from the examples given would be:
+The standard full test output from the examples given would be:
 
-
-    PPPUUUUU
-    --------------------------------------------------------------------------------
+    ------------------------------------------------------------------------
     A context:
     A nested context:
-      A test                                                                     [P]
+      A test                                                             [P]
       Another nested context:
-        Another test                                                             [P]
-    A test in the top-level context                                              [P]
-    --------------------------------------------------------------------------------
-    A test with no context                                                       [U]
-    --------------------------------------------------------------------------------
-    Another test with no context                                                 [U]
-    --------------------------------------------------------------------------------
+        Another test                                                     [P]
+    A test in the top-level context                                      [F]
+    ------------------------------------------------------------------------
+    A test with no context                                               [U]
+    Another test with no context                                         [U]
+    ------------------------------------------------------------------------
     This is a context:
     This is another context:
-      this is a test                                                             [U]
-      this is another test                                                       [U]
-      this is another test                                                       [U]
-    --------------------------------------------------------------------------------
-    8 tests, 3 assertions, 3 passed, 0 failed, 0 errors, 0 pending, 5 unassertive
+      this is a test                                                     [U]
+      this is another test                                               [U]
+      this is another test                                               [U]
+    ------------------------------------------------------------------------
+    8 tests 2 passed 3 assertions 1 failed 0 errors 5 unassertive 0 pending
+
+    A test in the top-level context:
+    Assert failed: expected '3' to be equal to '1'
+    stack traceback:
+      ./telescope.lua:128: in function 'assert_equal'
+      example.lua:18: in function <example.lua:17>
+      [C]: in function 'pcall'
+      ./telescope.lua:322: in function 'invoke_test'
+      ./telescope.lua:346: in function 'run'
+      ./ts:129: in main chunk
+      [C]: ?
+
 
 Telescope tells you which tests were run, how many assertions they called,
 how many passed, how many failed, how many produced errors, how many provided
 a name but no implementation, and how many didn't assert anything. In the event
-of any errors, it shows you stack traces.
+of any failures or errors, it shows you stack traces.
 
 You can customize the test output to be as verbose or silent as you want, and easily
 write your own test reporters - the source is well documented.
 
-A more robust command-line tool is under development.
+You can see all the available command-line options by running
+
+    ts -h
 
 ### More Examples ###
 

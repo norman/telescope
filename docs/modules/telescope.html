@@ -42,15 +42,6 @@
 
 <!-- File list -->
 
-<h1>Files</h1>
-<ul>
-
-	<li>
-		<a href="../files/telescope.html">telescope.lua</a>
-	</li>
-
-</ul>
-
 
 
 
@@ -62,11 +53,11 @@
 
 <h1>Module <code>telescope</code></h1>
 
-<p>Telescope is a test library for Lua that allows for flexible, declarative tests. For information, please visit the project homepage at: <a href="http://telescope.luaforge.net/">http://telescope.luaforge.net</a>.</p>
+<p>Telescope is a test library for Lua that allows for flexible, declarative tests. The documentation produced here is intended largely for developers working on Telescope.  For information on using Telescope, please visit the project homepage at: <a href="http://telescope.luaforge.net/">http://telescope.luaforge.net</a>.</p>
 
 
 
-<p><small><b>Release:</b> 0.1</small></p>
+<p><small><b>Release:</b> 0.2</small></p>
 
 
 
@@ -74,13 +65,23 @@
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#error_report">error_report</a>&nbsp;(results)</td>
-	<td class="summary">Show stack traces for tests which produced a failure or an error.</td>
+	<td class="name" nowrap><a href="#ancestors">ancestors</a>&nbsp;(i, contexts)</td>
+	<td class="summary">(local) Finds the value in the contexts table indexed with i, and returns a table of i's ancestor contexts.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#error_report">error_report</a>&nbsp;(contexts, results)</td>
+	<td class="summary">Return a table of stack traces for tests which produced a failure or an error.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#filter">filter</a>&nbsp;(t, f)</td>
+	<td class="summary">(local) Filter a table's values by function.</td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#invert_table">invert_table</a>&nbsp;(t)</td>
-	<td class="summary">Return a table with table t's values as keys and keys as values.</td>
+	<td class="summary">(local) Return a table with table t's values as keys and keys as values.</td>
 	</tr>
 
 	<tr>
@@ -99,13 +100,13 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#summary_report">summary_report</a>&nbsp;(results)</td>
-	<td class="summary">Show a one-line report with the status counts.</td>
+	<td class="name" nowrap><a href="#summary_report">summary_report</a>&nbsp;(contexts, results)</td>
+	<td class="summary">Get a one-line report and a summary table with the status counts.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#test_report">test_report</a>&nbsp;(results)</td>
-	<td class="summary">Show a detailed report for each context, with the status of each test.</td>
+	<td class="name" nowrap><a href="#test_report">test_report</a>&nbsp;(contexts, results)</td>
+	<td class="summary">Return a detailed report for each context, with the status of each test.</td>
 	</tr>
 
 </table>
@@ -117,8 +118,18 @@
 <table class="table_list">
 
 	<tr>
+	<td class="name" nowrap><a href="#after_aliases">after_aliases</a></td>
+	<td class="summary">The default names for "after" blocks.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#assertions">assertions</a></td>
 	<td class="summary">The default assertions.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#before_aliases">before_aliases</a></td>
+	<td class="summary">The default names for "before" blocks.</td>
 	</tr>
 
 	<tr>
@@ -155,16 +166,80 @@
 
 
 
-<dt><a name="error_report"></a><strong>error_report</strong>&nbsp;(results)</dt>
+<dt><a name="ancestors"></a><strong>ancestors</strong>&nbsp;(i, contexts)</dt>
 <dd>
-Show stack traces for tests which produced a failure or an error.
+(local) Finds the value in the contexts table indexed with i, and returns a table of i's ancestor contexts.
 
 
 <h3>Parameters</h3>
 <ul>
 	
 	<li>
-	  results: 
+	  i: The index in the <tt>contexts</tt> table to get ancestors for.
+	</li>
+	
+	<li>
+	  contexts: The table in which to find the ancestors.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="error_report"></a><strong>error_report</strong>&nbsp;(contexts, results)</dt>
+<dd>
+Return a table of stack traces for tests which produced a failure or an error.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  contexts: The contexts returned by <tt>load_contexts</tt>.
+	</li>
+	
+	<li>
+	  results: The results returned by <tt>run</tt>.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="filter"></a><strong>filter</strong>&nbsp;(t, f)</dt>
+<dd>
+(local) Filter a table's values by function. This function iterates over a table , returning only the table entries that, when passed into function f, yield a truthy value.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  t: The table over which to iterate.
+	</li>
+	
+	<li>
+	  f: The filter function.
 	</li>
 	
 </ul>
@@ -183,7 +258,7 @@ Show stack traces for tests which produced a failure or an error.
 
 <dt><a name="invert_table"></a><strong>invert_table</strong>&nbsp;(t)</dt>
 <dd>
-Return a table with table t's values as keys and keys as values.
+(local) Return a table with table t's values as keys and keys as values.
 
 
 <h3>Parameters</h3>
@@ -209,7 +284,7 @@ Return a table with table t's values as keys and keys as values.
 
 <dt><a name="load_contexts"></a><strong>load_contexts</strong>&nbsp;(path, contexts)</dt>
 <dd>
-Build a contexts table from the test file given in <tt>path</tt>. If the optional <tt>contexts</tt> table argument is provided, than the resulting contexts will be added to it. <p> The resulting contexts table has a structure as follows: </p> <code> { 1 = { name = "A context", context = { 1 = { name = "A nested context", context = { 1 = { name = "A test", func = function: 0x143390 } } } } } } </code> <p> In other words, a context table is a list of tables. Each table in the list is an associative array with two fields: "name," and either "context" or "function." The second field is either another context table, or a a function created by a test block. </p>
+Build a contexts table from the test file given in <tt>path</tt>. If the optional <tt>contexts</tt> table argument is provided, then the resulting contexts will be added to it. <p> The resulting contexts table's structure is as follows: </p> <code> { {parent = 0, name = "this is a context", context = true}, {parent = 1, name = "this is a nested context", context = true}, {parent = 2, name = "this is a test", test = function}, {parent = 2, name = "this is another test", test = function}, {parent = 0, name = "this is test outside any context", test = function}, } </code>
 
 
 <h3>Parameters</h3>
@@ -220,7 +295,7 @@ Build a contexts table from the test file given in <tt>path</tt>. If the optiona
 	</li>
 	
 	<li>
-	  contexts: 
+	  contexts: A optional table in which to collect the resulting contexts and function.
 	</li>
 	
 </ul>
@@ -285,7 +360,7 @@ Create a custom assertion. This creates an assertion along with a corresponding 
 
 <dt><a name="run"></a><strong>run</strong>&nbsp;(contexts, callbacks)</dt>
 <dd>
-Run all tests. This function will exectute each function in the contexts table, and add the following fields to its corresponding table: <ul> <li>status_code - the test status code</li> <li>status_label - the label for the status_code</li> <li>message - a table with an error message and stack trace, if the test failed or produced an error.</li> </ul>
+Run all tests. This function will exectute each function in the contexts table.
 
 
 <h3>Parameters</h3>
@@ -296,7 +371,7 @@ Run all tests. This function will exectute each function in the contexts table, 
 	</li>
 	
 	<li>
-	  callbacks: A table of callback functions to be invoked before or after various test states. <p> There is a callback for each test <tt>status_code</tt>. Valid callbacks are: </p> <ul> <li>after - will be invoked after each test</li> <li>before - will be invoked before each test</li> <li>err - will be invoked after each test which results in an error</li> <li>fail - will be invoked after each failing test</li> <li>pass - will be invoked after each passing test</li> <li>pending - will be invoked after each pending test</li> <li>unassertive - will be invoked after each test which doesn't assert anything</li> </ul> <p> Callbacks could be used, for example, to drop into a debugger upon a failed expectation or error, for profiling, or updating a GUI progress meter. </p>
+	  callbacks: A table of callback functions to be invoked before or after various test states. <p> There is a callback for each test <tt>status_code</tt>, and callbacks to run before or after each test invocation regardless of outcome. </p> <ul> <li>after - will be invoked after each test</li> <li>before - will be invoked before each test</li> <li>err - will be invoked after each test which results in an error</li> <li>fail - will be invoked after each failing test</li> <li>pass - will be invoked after each passing test</li> <li>pending - will be invoked after each pending test</li> <li>unassertive - will be invoked after each test which doesn't assert anything</li> </ul> <p> Callbacks can be used, for example, to drop into a debugger upon a failed assertion or error, for profiling, or updating a GUI progress meter. </p>
 	</li>
 	
 </ul>
@@ -307,7 +382,7 @@ Run all tests. This function will exectute each function in the contexts table, 
 
 
 <h3>Return value:</h3>
-A table with the following fields: <ul> <li>assertions - assertion count</li> <li>errors - error count</li> <li>failures - failure count</li> <li>passes - passed test count</li> <li>pendings - pending count</li> <li>tests - test count</li> <li>unassertive - unassertive test count</li> <li>contexts - the context table passed as an argument to <tt>run</tt>.</li> </ul>
+A table of result tables. Each result table has the following fields: <ul> <li>assertions_invoked - the number of assertions the test invoked</li> <li>context            - the name of the context</li> <li>message            - a table with an error message and stack trace</li> <li>name               - the name of the test</li> <li>status_code        - the resulting status code</li> <li>status_label       - the label for the status_code</li> </ul>
 
 
 
@@ -329,16 +404,20 @@ A table with the following fields: <ul> <li>assertions - assertion count</li> <l
 
 
 
-<dt><a name="summary_report"></a><strong>summary_report</strong>&nbsp;(results)</dt>
+<dt><a name="summary_report"></a><strong>summary_report</strong>&nbsp;(contexts, results)</dt>
 <dd>
-Show a one-line report with the status counts. The counts given are: total tests, assertions, passed tests, failed tests, pending tests, and tests which didn't assert anything.
+Get a one-line report and a summary table with the status counts. The counts given are: total tests, assertions, passed tests, failed tests, pending tests, and tests which didn't assert anything.
 
 
 <h3>Parameters</h3>
 <ul>
 	
 	<li>
-	  results: 
+	  contexts: The contexts returned by <tt>load_contexts</tt>.
+	</li>
+	
+	<li>
+	  results: The results returned by <tt>run</tt>.
 	</li>
 	
 </ul>
@@ -348,6 +427,15 @@ Show a one-line report with the status counts. The counts given are: total tests
 
 
 
+<h3>Return values:</h3>
+<ol>
+	
+	<li>A report that can be printed
+	
+	<li>A table with the various counts. Its fields are: <tt>assertions</tt>, <tt>errors</tt>, <tt>failed</tt>, <tt>passed</tt>, <tt>pending</tt>, <tt>tests</tt>, <tt>unassertive</tt>.
+	
+</ol>
+
 
 
 </dd>
@@ -355,16 +443,20 @@ Show a one-line report with the status counts. The counts given are: total tests
 
 
 
-<dt><a name="test_report"></a><strong>test_report</strong>&nbsp;(results)</dt>
+<dt><a name="test_report"></a><strong>test_report</strong>&nbsp;(contexts, results)</dt>
 <dd>
-Show a detailed report for each context, with the status of each test.
+Return a detailed report for each context, with the status of each test.
 
 
 <h3>Parameters</h3>
 <ul>
 	
 	<li>
-	  results: 
+	  contexts: The contexts returned by <tt>load_contexts</tt>.
+	</li>
+	
+	<li>
+	  results: The results returned by <tt>run</tt>.
 	</li>
 	
 </ul>
@@ -387,6 +479,14 @@ Show a detailed report for each context, with the status of each test.
 <h2><a name="tables"></a>Tables</h2>
 <dl class="table">
 
+<dt><a name="after_aliases"></a><strong>after_aliases</strong></dt>
+<dd>The default names for "after" blocks. It defaults to "after" and "teardown." The function in the after block will be run after each sibling test function or context.
+
+
+
+</dd>
+
+
 <dt><a name="assertions"></a><strong>assertions</strong></dt>
 <dd>The default assertions. These are the assertions built into telescope. You can override them or create your own custom assertions using <tt>make_assertion</tt>. <ul> <tt><li>assert_nil(a)</tt> - true if a is nil</li> <tt><li>assert_blank(a)</tt> - true if a is nil, or the empty string</li> <tt><li>assert_empty(a)</tt> - true if a is an empty table</li> <tt><li>assert_equal(a, b)</tt> - true if a == b</li> <tt><li>assert_match(a, b)</tt> - true if b is a string that matches pattern a</li> <tt><li>assert_greater_than(a, b)</tt> - true if a > b</li> <tt><li>assert_less_than(a, b)</tt> - true if a < b</li> <tt><li>assert_gte(a, b)</tt> - true if a >= b</li> <tt><li>assert_lte(a, b)</tt> - true if a <= b</li> <tt><li>assert_not_nil(a)</tt> - true if a is not nil</li> <tt><li>assert_not_blank(a)</tt>  - true if a is not nil and a is not the empty string</li> <tt><li>assert_not_empty(a)</tt> - true if a is a table, and a is not empty</li> <tt><li>assert_not_equal(a, b)</tt> - true if a ~= b</li> <tt><li>assert_not_match(a, b)</tt> - true if the string b does not match the pattern a</li> <tt><li>assert_not_greater_than(a, b)</tt> - true if not (a > b)</li> <tt><li>assert_not_less_than(a, b)</tt> - true if not (a < b)</li> <tt><li>assert_not_gte(a, b)</tt> - true if not (a >= b)</li> <tt><li>assert_not_lte(a, b)</tt> - true if not (a <= b)</li> </ul>
 
@@ -395,8 +495,16 @@ Show a detailed report for each context, with the status of each test.
 </dd>
 
 
+<dt><a name="before_aliases"></a><strong>before_aliases</strong></dt>
+<dd>The default names for "before" blocks. It defaults to "before" and "setup." The function in the before block will be run before each sibling test function or context.
+
+
+
+</dd>
+
+
 <dt><a name="context_aliases"></a><strong>context_aliases</strong></dt>
-<dd>The default names for context blocks. It defaults to "context", "spec" and "describe." You can override this table to create your own custom name for contexts.
+<dd>The default names for context blocks. It defaults to "context", "spec" and "describe." contexts.
 
 
 
@@ -470,7 +578,7 @@ Show a detailed report for each context, with the status of each test.
 
 
 <dt><a name="test_aliases"></a><strong>test_aliases</strong></dt>
-<dd>The default names for test blocks. It defaults to "test," "it", "expect" and "should." You can override this table to create your own custom name for tests.
+<dd>The default names for test blocks. It defaults to "test," "it", "expect" and "should."
 
 
 
