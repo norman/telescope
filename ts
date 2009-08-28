@@ -1,7 +1,6 @@
 #!/usr/bin/env lua
 require 'luarocks.require'
 require 'telescope'
-require 'std'
 
 local function getopt(arg, options)
   local tab = {}
@@ -52,8 +51,24 @@ Description:
 
 Options:
 
-  -f,     --format=full     Show full report format
+  -f,     --full            Show full report
+  -q,     --quiet           Show don't show any stack traces
+  -s      --silent          Don't show any output
   -h,-?   --help            Show this text
+          --load=<file>     Load a Lua file before executing command
+
+  Callback options:
+    --after=<function>        Run function given after each test
+    --before=<function>       Run function before each test
+    --err=<function>          Run function after each test that produces an error
+    --fail<function>          Run function after each failing test
+    --pass=<function>         Run function after each passing test
+    --pending=<function>      Run function after each pending test
+    --unassertive=<function>  Run function after each unassertive test
+
+  An example callback:
+
+    ts --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
 
 An example test:
 
@@ -113,9 +128,12 @@ if opts["h"] or opts["?"] or opts["help"] or not (next(opts) or next(files)) the
   os.exit()
 end
 
+-- load a file with custom functionality if desired
+if opts["load"] then dofile(opts["load"]) end
+
 -- set callbacks passed on command line
 local callback_args = { "after", "before", "err", "fail", "pass",
-  "pending", "unassertive"}
+  "pending", "unassertive" }
 for _, callback in ipairs(callback_args) do
   if opts[callback] then
     add_callback(callback, loadstring('return ' .. opts[callback])())
@@ -123,25 +141,29 @@ for _, callback in ipairs(callback_args) do
 end
 
 local contexts = {}
-for _, file in ipairs(files) do
-  telescope.load_contexts(file, contexts)
-end
+for _, file in ipairs(files) do telescope.load_contexts(file, contexts) end
 
-local results = telescope.run(contexts, callbacks)
 local buffer = {}
+local results = telescope.run(contexts, callbacks)
+local summary, data = telescope.summary_report(contexts, results)
 
-if opts.format == "full" or opts.f then
+if opts.f or opts.full then
   table.insert(buffer, telescope.test_report(contexts, results))
-  table.insert(buffer, telescope.summary_report(contexts, results))
-  table.insert(buffer, "")
-  table.insert(buffer, telescope.error_report(contexts, results))
-else
-  table.insert(buffer, telescope.summary_report(contexts, results))
-  table.insert(buffer, "")
-  table.insert(buffer, telescope.error_report(contexts, results))
 end
 
-print(table.concat(buffer, "\n"))
-os.exit()
+if not opts.s and not opts.silent then
+  table.insert(buffer, summary)
+  if not opts.q and not opts.quiet then
+    local report = telescope.error_report(contexts, results)
+    if report then table.insert(buffer, report) end
+  end
+end
 
-
+if #buffer > 0 then print(table.concat(buffer, "\n")) end
+for _, v in pairs(results) do
+  if v.status_code == telescope.status_codes.err or
+    v.status_code == telescope.status_codes.fail then
+    os.exit(1)
+  end
+end
+os.exit(0)
