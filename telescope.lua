@@ -1,7 +1,8 @@
---- Telescope is a test library for Lua that allows for flexible, declarative tests.
--- For information, please visit the project homepage at:
--- <a href="http://telescope.luaforge.net/">http://telescope.luaforge.net</a>.
--- @release 0.1
+--- Telescope is a test library for Lua that allows for flexible, declarative
+-- tests. The documentation produced here is intended largely for developers
+-- working on Telescope.  For information on using Telescope, please visit the
+-- project homepage at: <a href="http://telescope.luaforge.net/">http://telescope.luaforge.net</a>.
+-- @release 0.2
 module('telescope', package.seeall)
 
 --- The status codes that can be returned by an invoked test. These should not be overidden.
@@ -41,19 +42,29 @@ status_labels = {
 }
 
 --- The default names for context blocks. It defaults to "context", "spec" and
--- "describe." You can override this table to create your own custom name for
+-- "describe."
 -- contexts.
 -- @name context_aliases
 -- @class table
 context_aliases = {"context", "describe", "spec"}
 --- The default names for test blocks. It defaults to "test," "it", "expect" and
--- "should." You can override this table to create your own custom name for
--- tests.
+-- "should."
 -- @name test_aliases
 -- @class table
 test_aliases    = {"test", "it", "expect", "should"}
 
+--- The default names for "before" blocks. It defaults to "before" and "setup."
+-- The function in the before block will be run before each sibling test function
+-- or context.
+-- @name before_aliases
+-- @class table
 before_aliases  = {"before", "setup"}
+
+--- The default names for "after" blocks. It defaults to "after" and "teardown."
+-- The function in the after block will be run after each sibling test function
+-- or context.
+-- @name after_aliases
+-- @class table
 after_aliases  = {"after", "teardown"}
 
 -- Prefix to place before all assertion messages. Used by make_assertion().
@@ -136,16 +147,19 @@ function make_assertion(name, message, func)
   end
 end
 
---- Return a table with table t's values as keys and keys as values.
+--- (local) Return a table with table t's values as keys and keys as values.
 local function invert_table(t)
   t2 = {}
   for k, v in pairs(t) do t2[v] = k end
   return t2
 end
 
--- Truncate a string "s" to length "len", optionally followed by the string
--- given in "after" if truncated; for example, truncate_string("hello world",
--- 3, "...")
+-- (local) Truncate a string "s" to length "len", optionally followed by the
+-- string given in "after" if truncated; for example, truncate_string("hello
+-- world", 3, "...")
+-- @param s The string to truncate.
+-- @param len The desired length.
+-- @param after A string to append to s, if it is truncated.
 local function truncate_string(s, len, after)
   if string.len(s) <= len then
     return s
@@ -155,6 +169,11 @@ local function truncate_string(s, len, after)
   end
 end
 
+--- (local) Filter a table's values by function. This function iterates over a
+-- table , returning only the table entries that, when passed into function f,
+-- yield a truthy value.
+-- @param t The table over which to iterate.
+-- @param f The filter function.
 local function filter(t, f)
   local a, b
   return function()
@@ -165,6 +184,10 @@ local function filter(t, f)
   end
 end
 
+--- (local) Finds the value in the contexts table indexed with i, and returns a table
+-- of i's ancestor contexts.
+-- @param i The index in the <tt>contexts</tt> table to get ancestors for.
+-- @param contexts The table in which to find the ancestors.
 local function ancestors(i, contexts)
   if i == 0 then return end
   local a = {}
@@ -195,20 +218,13 @@ make_assertion("lte",          "'%s' to be less than or equal to '%s'",    funct
 -- </p>
 -- <code>
 -- {
---   {0, "this is a context"},
---   {1, "this is a nested context"},
---   {2, "this is a test", func},
---   {2, "this is another test", func},
---   {0, "this is test outside any context"},
+--   {parent = 0, name = "this is a context", context = true},
+--   {parent = 1, name = "this is a nested context", context = true},
+--   {parent = 2, name = "this is a test", test = function},
+--   {parent = 2, name = "this is another test", test = function},
+--   {parent = 0, name = "this is test outside any context", test = function},
 -- }
 -- </code>
--- <p>
--- In other words, a context table is a list of tables. Each table's first
--- value is the index of the value's parent context. If the index is 0, then it
--- lies outside of any context. Each table's second value is its name. If the
--- table has a third value, then the table represents a test and the third
--- value is the test to be run.
--- </p>
 -- @param contexts A optional table in which to collect the resulting contexts
 -- and function.
 function load_contexts(path, contexts)
@@ -251,20 +267,13 @@ function load_contexts(path, contexts)
 end
 
 --- Run all tests.
--- This function will exectute each function in the contexts table, and add the
--- following fields to its corresponding table:
--- <ul>
--- <li>status_code - the test status code</li>
--- <li>status_label - the label for the status_code</li>
--- <li>message - a table with an error message and stack trace, if the test
--- failed or produced an error.</li>
--- </ul>
+-- This function will exectute each function in the contexts table.
 -- @param contexts The contexts created by <tt>load_contexts</tt>.
 -- @param callbacks A table of callback functions to be invoked before or after
 -- various test states.
 -- <p>
--- There is a callback for each test <tt>status_code</tt>.
--- Valid callbacks are:
+-- There is a callback for each test <tt>status_code</tt>, and callbacks to run
+-- before or after each test invocation regardless of outcome.
 -- </p>
 -- <ul>
 -- <li>after - will be invoked after each test</li>
@@ -277,19 +286,18 @@ end
 -- anything</li>
 -- </ul>
 -- <p>
--- Callbacks could be used, for example, to drop into a debugger upon a failed
--- expectation or error, for profiling, or updating a GUI progress meter.
+-- Callbacks can be used, for example, to drop into a debugger upon a failed
+-- assertion or error, for profiling, or updating a GUI progress meter.
 -- </p>
--- @return A table with the following fields:
+-- @return A table of result tables. Each result table has the following
+-- fields:
 -- <ul>
--- <li>assertions - assertion count</li>
--- <li>errors - error count</li>
--- <li>failures - failure count</li>
--- <li>passes - passed test count</li>
--- <li>pendings - pending count</li>
--- <li>tests - test count</li>
--- <li>unassertive - unassertive test count</li>
--- <li>contexts - the context table passed as an argument to <tt>run</tt>.</li>
+-- <li>assertions_invoked - the number of assertions the test invoked</li>
+-- <li>context            - the name of the context</li>
+-- <li>message            - a table with an error message and stack trace</li>
+-- <li>name               - the name of the test</li>
+-- <li>status_code        - the resulting status code</li>
+-- <li>status_label       - the label for the status_code</li>
 -- </ul>
 -- @see load_contexts
 -- @see status_codes
@@ -308,7 +316,7 @@ function run(contexts, callbacks)
     if not callbacks then return end
     if type(callbacks[name]) == "table" then
       for _, c in ipairs(callbacks[name]) do c(test) end
-    elseif type(callbacks[name]) == "function" then
+    elseif callbacks[name] then
       callbacks[name](test)
     end
   end
@@ -332,11 +340,19 @@ function run(contexts, callbacks)
   end
 
   for i, v in filter(contexts, function(i, v) return v.test end) do
-    local result = { test = i, status_code = status_codes.pending }
     local ancestors = ancestors(i, contexts)
+    local context_name = 'Top level'
+    if contexts[i].parent ~= 0 then
+      context_name = contexts[contexts[i].parent].name
+    end
+    local result = {
+      name    = contexts[i].name,
+      context = context_name,
+      test    = i
+    }
     table.sort(ancestors)
     -- this "before" is the test callback passed into the runner
-    invoke_callback("before", v)
+    invoke_callback("before", result)
     -- this "before" is the "before" block in the test.
     for _, a in ipairs(ancestors) do
       if contexts[a].before then contexts[a].before() end
@@ -344,15 +360,16 @@ function run(contexts, callbacks)
     -- check if it's a function because pending tests will just have "true"
     if type(v.test) == "function" then
       result.status_code, result.assertions_invoked, result.message = invoke_test(v.test)
-      invoke_callback(status_names[status_code], result)
+      result.status_label = status_labels[result.status_code]
+      invoke_callback(status_names[result.status_code], result)
     else
-      invoke_callback("pending", v.test)
+      result.status_code = status_codes.pending
+      invoke_callback("pending", result)
     end
     for _, a in ipairs(ancestors) do
       if contexts[a].after then contexts[a].after() end
     end
     invoke_callback("after", result)
-    result.status_label = status_labels[result.status_code]
     results[i] = result
   end
 
@@ -360,7 +377,9 @@ function run(contexts, callbacks)
 
 end
 
---- Show a detailed report for each context, with the status of each test.
+--- Return a detailed report for each context, with the status of each test.
+-- @param contexts The contexts returned by <tt>load_contexts</tt>.
+-- @param results The results returned by <tt>run</tt>.
 function test_report(contexts, results)
 
   local level                = 0
@@ -402,19 +421,27 @@ function test_report(contexts, results)
 
 end
 
---- Show stack traces for tests which produced a failure or an error.
+--- Return a table of stack traces for tests which produced a failure or an error.
+-- @param contexts The contexts returned by <tt>load_contexts</tt>.
+-- @param results The results returned by <tt>run</tt>.
 function error_report(contexts, results)
   local buffer = {}
-  for _, r in filter(results, function(i, r) return r.status_code == status_codes.err end) do
+  for _, r in filter(results, function(i, r) return r.message end) do
     local name = contexts[r.test].name
     table.insert(buffer, name .. ":\n" .. r.message[1] .. "\n" .. r.message[2])
   end
-  return table.concat(buffer, "\n")
+  if #buffer > 0 then return table.concat(buffer, "\n") end
 end
 
---- Show a one-line report with the status counts. The counts given are: total
--- tests, assertions, passed tests, failed tests, pending tests, and tests which
--- didn't assert anything.
+--- Get a one-line report and a summary table with the status counts. The
+-- counts given are: total tests, assertions, passed tests, failed tests,
+-- pending tests, and tests which didn't assert anything.
+-- @return A report that can be printed
+-- @return A table with the various counts. Its fields are:
+-- <tt>assertions</tt>, <tt>errors</tt>, <tt>failed</tt>, <tt>passed</tt>,
+-- <tt>pending</tt>, <tt>tests</tt>, <tt>unassertive</tt>.
+-- @param contexts The contexts returned by <tt>load_contexts</tt>.
+-- @param results The results returned by <tt>run</tt>.
 function summary_report(contexts, results)
   local r = {
     assertions  = 0,
@@ -444,5 +471,5 @@ function summary_report(contexts, results)
     end
     table.insert(buffer, string.format("%d %s", number, label))
   end
-  return table.concat(buffer, " ")
+  return table.concat(buffer, " "), r
 end
