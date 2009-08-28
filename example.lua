@@ -22,6 +22,7 @@ end)
 
 -- 2. Tests with no context.
 test("A test with no context", function()
+  assert_error(function() this.works = false  end)
 end)
 
 test("Another test with no context", function()

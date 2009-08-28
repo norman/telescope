@@ -2,7 +2,22 @@
 
 A highly customizable test library for Lua that allows for declarative
 tests with nested contexts. Telescope is fairly full-featured despite
-being only about 250 lines of code.
+being only about 300 lines of code.
+
+## Features ##
+
+* Nestable test contexts/descriptions.
+* [BDD](http://en.wikipedia.org/wiki/Behavior_Driven_Development)-style test names.
+* Before/after functions per context.
+* Easily add your own assertions.
+* Many different formatting options for tests and reports.
+* Simple, [well documented API](http://telescope.luaforge.net/docs/modules/telescope.html) makes it easy to extend/hack.
+* Command line runner allows you to input Lua snippet callbacks, so you can, for example,
+  drop to a debugger on failed tests, or wrap test calls around a profiler, etc.
+* *Extremely* fast. So fast that it doesn't include a progress meter, because for most
+  projects it's completely pointless. You can easily add a progress meter using callbacks,
+  though, if you want one.
+* Less than 300 lines of code.
 
 ## An Example ##
 

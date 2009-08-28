@@ -43,7 +43,6 @@ status_labels = {
 
 --- The default names for context blocks. It defaults to "context", "spec" and
 -- "describe."
--- contexts.
 -- @name context_aliases
 -- @class table
 context_aliases = {"context", "describe", "spec"}
@@ -74,24 +73,26 @@ assertion_message_prefix  = "Assert failed: expected "
 -- These are the assertions built into telescope. You can override them or
 -- create your own custom assertions using <tt>make_assertion</tt>.
 -- <ul>
--- <tt><li>assert_nil(a)</tt> - true if a is nil</li>
 -- <tt><li>assert_blank(a)</tt> - true if a is nil, or the empty string</li>
 -- <tt><li>assert_empty(a)</tt> - true if a is an empty table</li>
 -- <tt><li>assert_equal(a, b)</tt> - true if a == b</li>
--- <tt><li>assert_match(a, b)</tt> - true if b is a string that matches pattern a</li>
+-- <tt><li>assert_error(f)</tt> - true if function f produces an error</li>
 -- <tt><li>assert_greater_than(a, b)</tt> - true if a > b</li>
--- <tt><li>assert_less_than(a, b)</tt> - true if a < b</li>
 -- <tt><li>assert_gte(a, b)</tt> - true if a >= b</li>
+-- <tt><li>assert_less_than(a, b)</tt> - true if a < b</li>
 -- <tt><li>assert_lte(a, b)</tt> - true if a <= b</li>
--- <tt><li>assert_not_nil(a)</tt> - true if a is not nil</li>
+-- <tt><li>assert_match(a, b)</tt> - true if b is a string that matches pattern a</li>
+-- <tt><li>assert_nil(a)</tt> - true if a is nil</li>
 -- <tt><li>assert_not_blank(a)</tt>  - true if a is not nil and a is not the empty string</li>
 -- <tt><li>assert_not_empty(a)</tt> - true if a is a table, and a is not empty</li>
 -- <tt><li>assert_not_equal(a, b)</tt> - true if a ~= b</li>
--- <tt><li>assert_not_match(a, b)</tt> - true if the string b does not match the pattern a</li>
+-- <tt><li>assert_not_error(f)</tt> - true if function f does not produce an error</li>
 -- <tt><li>assert_not_greater_than(a, b)</tt> - true if not (a > b)</li>
--- <tt><li>assert_not_less_than(a, b)</tt> - true if not (a < b)</li>
 -- <tt><li>assert_not_gte(a, b)</tt> - true if not (a >= b)</li>
+-- <tt><li>assert_not_less_than(a, b)</tt> - true if not (a < b)</li>
 -- <tt><li>assert_not_lte(a, b)</tt> - true if not (a <= b)</li>
+-- <tt><li>assert_not_match(a, b)</tt> - true if the string b does not match the pattern a</li>
+-- <tt><li>assert_not_nil(a)</tt> - true if a is not nil</li>
 -- </ul>
 -- @see make_assertion
 -- @name assertions
@@ -148,6 +149,7 @@ function make_assertion(name, message, func)
 end
 
 --- (local) Return a table with table t's values as keys and keys as values.
+-- @param t The table.
 local function invert_table(t)
   t2 = {}
   for k, v in pairs(t) do t2[v] = k end
@@ -200,15 +202,16 @@ local function ancestors(i, contexts)
   return a
 end
 
-make_assertion("nil",          "'%s' to be nil",                           function(a) return a == nil end)
 make_assertion("blank",        "'%s' to be blank",                         function(a) return a == '' or a == nil end)
 make_assertion("empty",        "'%s' to be an empty table",                function(a) return not next(a) end)
 make_assertion("equal",        "'%s' to be equal to '%s'",                 function(a, b) return a == b end)
-make_assertion("match",        "'%s' to be a match for %s",                function(a, b) return string.match(b, a) end)
+make_assertion("error",        "result to be an error",                    function(f) return not pcall(f) end)
 make_assertion("greater_than", "'%s' to be greater than '%s'",             function(a, b) return a > b end)
-make_assertion("less_than",    "'%s' to be less than '%s'",                function(a, b) return a < b end)
 make_assertion("gte",          "'%s' to be greater than or equal to '%s'", function(a, b) return a >= b end)
+make_assertion("less_than",    "'%s' to be less than '%s'",                function(a, b) return a < b end)
 make_assertion("lte",          "'%s' to be less than or equal to '%s'",    function(a, b) return a <= b end)
+make_assertion("match",        "'%s' to be a match for %s",                function(a, b) return string.match(b, a) end)
+make_assertion("nil",          "'%s' to be nil",                           function(a) return a == nil end)
 
 --- Build a contexts table from the test file given in <tt>path</tt>.
 -- If the optional <tt>contexts</tt> table argument is provided, then the
@@ -382,16 +385,16 @@ end
 -- @param results The results returned by <tt>run</tt>.
 function test_report(contexts, results)
 
-  local level                = 0
-  local previous_level       = 0
   local buffer               = {}
-  local width                = 72
-  local status_format        = "[%s]"
+  local leading_space        = "  "
+  local level                = 0
+  local line_char            = "-"
+  local previous_level       = 0
   local status_format_len    = 3
+  local status_format        = "[%s]"
+  local width                = 72
   local context_name_format  = "%-" .. width - status_format_len .. "s"
   local function_name_format = "%-" .. width - status_format_len .. "s"
-  local leading_space        = "  "
-  local line_char            = "-"
 
   local function space()
     return string.rep(leading_space, level - 1)
