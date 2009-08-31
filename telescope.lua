@@ -77,22 +77,28 @@ assertion_message_prefix  = "Assert failed: expected "
 -- <tt><li>assert_empty(a)</tt> - true if a is an empty table</li>
 -- <tt><li>assert_equal(a, b)</tt> - true if a == b</li>
 -- <tt><li>assert_error(f)</tt> - true if function f produces an error</li>
+-- <tt><li>assert_false(a)</tt> - true if a is false</li>
 -- <tt><li>assert_greater_than(a, b)</tt> - true if a > b</li>
 -- <tt><li>assert_gte(a, b)</tt> - true if a >= b</li>
 -- <tt><li>assert_less_than(a, b)</tt> - true if a < b</li>
 -- <tt><li>assert_lte(a, b)</tt> - true if a <= b</li>
 -- <tt><li>assert_match(a, b)</tt> - true if b is a string that matches pattern a</li>
 -- <tt><li>assert_nil(a)</tt> - true if a is nil</li>
+-- <tt><li>assert_true(a)</tt> - true if a is true</li>
+-- <tt><li>assert_type(a, b)</tt> - true if a is of type b</li>
 -- <tt><li>assert_not_blank(a)</tt>  - true if a is not nil and a is not the empty string</li>
 -- <tt><li>assert_not_empty(a)</tt> - true if a is a table, and a is not empty</li>
 -- <tt><li>assert_not_equal(a, b)</tt> - true if a ~= b</li>
 -- <tt><li>assert_not_error(f)</tt> - true if function f does not produce an error</li>
+-- <tt><li>assert_not_false(a)</tt> - true if a is not false</li>
 -- <tt><li>assert_not_greater_than(a, b)</tt> - true if not (a > b)</li>
 -- <tt><li>assert_not_gte(a, b)</tt> - true if not (a >= b)</li>
 -- <tt><li>assert_not_less_than(a, b)</tt> - true if not (a < b)</li>
 -- <tt><li>assert_not_lte(a, b)</tt> - true if not (a <= b)</li>
 -- <tt><li>assert_not_match(a, b)</tt> - true if the string b does not match the pattern a</li>
 -- <tt><li>assert_not_nil(a)</tt> - true if a is not nil</li>
+-- <tt><li>assert_not_true(a)</tt> - true if a is not true</li>
+-- <tt><li>assert_not_type(a, b)</tt> - true if a is not of type b</li>
 -- </ul>
 -- @see make_assertion
 -- @name assertions
@@ -206,12 +212,15 @@ make_assertion("blank",        "'%s' to be blank",                         funct
 make_assertion("empty",        "'%s' to be an empty table",                function(a) return not next(a) end)
 make_assertion("equal",        "'%s' to be equal to '%s'",                 function(a, b) return a == b end)
 make_assertion("error",        "result to be an error",                    function(f) return not pcall(f) end)
+make_assertion("false",        "'%s' to be false",                         function(a) return a == false end)
 make_assertion("greater_than", "'%s' to be greater than '%s'",             function(a, b) return a > b end)
 make_assertion("gte",          "'%s' to be greater than or equal to '%s'", function(a, b) return a >= b end)
 make_assertion("less_than",    "'%s' to be less than '%s'",                function(a, b) return a < b end)
 make_assertion("lte",          "'%s' to be less than or equal to '%s'",    function(a, b) return a <= b end)
 make_assertion("match",        "'%s' to be a match for %s",                function(a, b) return string.match(b, a) end)
 make_assertion("nil",          "'%s' to be nil",                           function(a) return a == nil end)
+make_assertion("true",         "'%s' to be true",                          function(a) return a == true end)
+make_assertion("type",         "'%s' to be a %s",                          function(a, b) return type(a) == b end)
 
 --- Build a contexts table from the test file given in <tt>path</tt>.
 -- If the optional <tt>contexts</tt> table argument is provided, then the
@@ -245,8 +254,13 @@ function load_contexts(path, contexts)
   end
 
   local function test_block(name, func)
-    local test_table = {name = name, func = func}
-    table.insert(context_table, {parent = current_index, name = name, test = func or true})
+    local test_table = {name = name, parent = current_index, test = func or true}
+    if current_index ~= 0 then
+      test_table.context_name = context_table[current_index].name
+    else
+      test_table.context_name = 'top level'
+    end
+    table.insert(context_table, test_table)
   end
 
   local function before_block(func)
@@ -262,6 +276,8 @@ function load_contexts(path, contexts)
   for _, v in ipairs(context_aliases) do env[v] = context_block end
   for _, v in ipairs(test_aliases) do env[v] = test_block end
 
+  assert(io.input(path))
+  io.close()
   local func = loadfile(path)
   setfenv(func, env)
   func()
@@ -349,9 +365,10 @@ function run(contexts, callbacks)
       context_name = contexts[contexts[i].parent].name
     end
     local result = {
-      name    = contexts[i].name,
-      context = context_name,
-      test    = i
+      assertions_invoked = 0,
+      name               = contexts[i].name,
+      context            = context_name,
+      test               = i
     }
     table.sort(ancestors)
     -- this "before" is the test callback passed into the runner
@@ -363,12 +380,12 @@ function run(contexts, callbacks)
     -- check if it's a function because pending tests will just have "true"
     if type(v.test) == "function" then
       result.status_code, result.assertions_invoked, result.message = invoke_test(v.test)
-      result.status_label = status_labels[result.status_code]
       invoke_callback(status_names[result.status_code], result)
     else
       result.status_code = status_codes.pending
       invoke_callback("pending", result)
     end
+    result.status_label = status_labels[result.status_code]
     for _, a in ipairs(ancestors) do
       if contexts[a].after then contexts[a].after() end
     end
