@@ -25,7 +25,13 @@ local function luacov_report()
     li { list-style-type: none; font-size: 11px}
     .covered { background-color: #98FB98 }
     .uncovered { background-color: #FFC0CB }
-    .file { width: 800px; background-color: #c0c0c0; }
+    .file { width: 800px;
+      background-color: #c0c0c0;
+      padding: 3px;
+      overflow: hidden;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px; }
   </style>
   </head>
   <body>
@@ -70,13 +76,13 @@ local function luacov_report()
              or line:match("^%s*}%s*$") -- Single closing brace
              or line:match("^#!") -- Unix hash-bang magic line
            then
-              report:write("<li><pre>", line_nr, ".      ", line, "</pre></li>", "\n")
+              report:write("<li><pre>", string.format("%-4d", line_nr), "      ", line, "</pre></li>", "\n")
            else
               local hits = filedata[line_nr]
               local class = "uncovered"
               if not hits then hits = 0 end
               if hits > 0 then class = "covered" end
-              report:write("<li>", " <pre ", "class='", class, "'>", line_nr, ". ", string.format("%-4d", hits), "&nbsp;", line, "</pre></li>", "\n")
+              report:write("<li>", " <pre ", "class='", class, "'>", string.format("%-4d", line_nr), string.format("%-4d", hits), "&nbsp;", line, "</pre></li>", "\n")
            end
            line_nr = line_nr + 1
         end
