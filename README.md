@@ -56,13 +56,13 @@ If you want to work on the source code, you can clone the git repository from:
 ## Running your tests ##
 
 Telescope currently comes with a very basic command-line test runner,
-called "ts", which is installed by Luarocks. Simply run:
+called "tsc", which is installed by Luarocks. Simply run:
 
-    ts my_test_file.lua
+    tsc my_test_file.lua
 
 Or perhaps
 
-    ts -f test/*.lua
+    tsc -f test/*.lua
 
 The full test output (what you get using "-f") from the examples given would be:
 
@@ -110,7 +110,7 @@ Telescope with other applications.
 
 You can see all the available command-line options, and some examples by running:
 
-    ts -h
+    tsc -h
 
 ### More Examples ###
 
@@ -156,8 +156,8 @@ You can see all the available command-line options, and some examples by running
      error = function(t) debug.debug() end
     })
 
-    -- call "ts" on the command line with a callback to generate a custom report
-    ts --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
+    -- call "tsc" on the command line with a callback to generate a custom report
+    tsc --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
 
 ## Author ##
 

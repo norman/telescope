@@ -22,7 +22,7 @@ build = {
       "telescope.lua",
     },
     bin = {
-      "ts"
+      "tsc"
     }
   }
 }

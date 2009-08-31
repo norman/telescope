@@ -130,9 +130,9 @@ end
 
 local function show_usage()
   local text = [[
-Telescope v 0.1
+Telescope v 0.3
 
-Usage: ts [options] [files]
+Usage: tsc [options] [files]
 
 Description:
   Telescope is a test framework for Lua that allows you to write tests
@@ -158,7 +158,7 @@ Options:
 
   An example callback:
 
-    ts --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
+    tsc --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
 
 An example test:
 

@@ -2,7 +2,7 @@
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
 -- project homepage at: <a href="http://telescope.luaforge.net/">http://telescope.luaforge.net</a>.
--- @release 0.2
+-- @release 0.3
 module('telescope', package.seeall)
 
 --- The status codes that can be returned by an invoked test. These should not be overidden.
