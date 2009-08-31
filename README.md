@@ -1,8 +1,7 @@
 # Telescope #
 
 A highly customizable test library for Lua that allows for declarative
-tests with nested contexts. Telescope is fairly full-featured despite
-being only about 300 lines of code.
+tests with nested contexts.
 
 ## Features ##
 
@@ -17,7 +16,7 @@ being only about 300 lines of code.
 * *Extremely* fast. So fast that it doesn't include a progress meter, because for most
   projects it's completely pointless. You can easily add a progress meter using callbacks,
   though, if you want one.
-* Less than 300 lines of code.
+* Main library is less than 300 lines of code.
 
 ## An Example ##
 
