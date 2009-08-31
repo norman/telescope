@@ -43,8 +43,8 @@ local function luacov_report()
 
   for _, filename in ipairs(names) do
      if string.match(filename, "/luacov/") or
-        string.match(filename, "luarocks/require%.lua") or
-        string.match(filename, "/ts$")
+        string.match(filename, "/luarocks/") or
+        string.match(filename, "/tsc$")
      then
        break
      end
