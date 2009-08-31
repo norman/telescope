@@ -2,6 +2,95 @@
 require 'luarocks.require'
 require 'telescope'
 
+local function luacov_report()
+  local luacov = require("luacov.stats")
+  local data = luacov.load_stats()
+  if not data then
+     print("Could not load stats file "..luacov.statsfile..".")
+     print("Run your Lua program with -lluacov and then rerun luacov.")
+     os.exit(1)
+  end
+  local report = io.open("coverage.html", "w")
+  report:write('<!DOCTYPE html>', "\n")
+  report:write([[
+  <html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>Luacov Coverage Report
+  </title>
+  <style type="text/css">
+    body { text-align: center; }
+    #wrapper { width: 800px; margin: auto; text-align: left; }
+    pre, ul, li { margin: 0; padding: 0 }
+    li { list-style-type: none; font-size: 11px}
+    .covered { background-color: #98FB98 }
+    .uncovered { background-color: #FFC0CB }
+    .file { width: 800px; background-color: #c0c0c0; }
+  </style>
+  </head>
+  <body>
+  <div id="wrapper">
+  <h1>Luacov Code Coverage Report</h1>
+  ]])
+  report:write("<p>Generated on ", os.date(), "</p>\n")
+
+  local names = {}
+  for filename, _ in pairs(data) do
+     table.insert(names, filename)
+  end
+
+  table.sort(names)
+
+  for _, filename in ipairs(names) do
+     if string.match(filename, "/luacov/") or
+        string.match(filename, "luarocks/require%.lua") or
+        string.match(filename, "/ts$")
+     then
+       break
+     end
+     local filedata = data[filename]
+     filename = string.gsub(filename, "^%./", "")
+     local file = io.open(filename, "r")
+     if file then
+        report:write("<h2>", filename, "</h2>", "\n")
+        report:write("<div class='file'>")
+        report:write("<ul>", "\n")
+        local line_nr = 1
+        while true do
+           local line = file:read("*l")
+           if not line then break end
+           line = string.gsub(line, ">", "&gt;")
+           line = string.gsub(line, "<", "&lt;")
+           if line:match("^%s*%-%-") then -- Comment line
+
+           elseif line:match("^%s*$")    -- Empty line
+             or line:match("^%s*end,?%s*$") -- Single "end"
+             or line:match("^%s*else%s*$") -- Single "else"
+             or line:match("^%s*{%s*$") -- Single opening brace
+             or line:match("^%s*}%s*$") -- Single closing brace
+             or line:match("^#!") -- Unix hash-bang magic line
+           then
+              report:write("<li><pre>", line_nr, ".      ", line, "</pre></li>", "\n")
+           else
+              local hits = filedata[line_nr]
+              local class = "uncovered"
+              if not hits then hits = 0 end
+              if hits > 0 then class = "covered" end
+              report:write("<li>", " <pre ", "class='", class, "'>", line_nr, ". ", string.format("%-4d", hits), "&nbsp;", line, "</pre></li>", "\n")
+           end
+           line_nr = line_nr + 1
+        end
+     end
+     report:write("</ul>", "\n")
+     report:write("</div>", "\n")
+  end
+  report:write([[
+</div>
+</body>
+</html>
+  ]])
+end
+
 local function getopt(arg, options)
   local tab = {}
   for k, v in ipairs(arg) do
@@ -55,6 +144,7 @@ Options:
   -q,     --quiet           Show don't show any stack traces
   -s      --silent          Don't show any output
   -h,-?   --help            Show this text
+  -c      --luacov          Output a coverage file using Luacov (http://luacov.luaforge.net/)
           --load=<file>     Load a Lua file before executing command
 
   Callback options:
@@ -128,6 +218,10 @@ if opts["h"] or opts["?"] or opts["help"] or not (next(opts) or next(files)) the
   os.exit()
 end
 
+if opts.c or opts.luacov then
+  require "luacov.tick"
+end
+
 -- load a file with custom functionality if desired
 if opts["load"] then dofile(opts["load"]) end
 
@@ -163,10 +257,15 @@ if not opts.s and not opts.silent then
 end
 
 if #buffer > 0 then print(table.concat(buffer, "\n")) end
+
+if opts.c or opts.coverage then
+  luacov_report()
+  os.remove("luacov.stats.out")
+end
+
 for _, v in pairs(results) do
   if v.status_code == telescope.status_codes.err or
     v.status_code == telescope.status_codes.fail then
     os.exit(1)
   end
 end
-os.exit(0)
