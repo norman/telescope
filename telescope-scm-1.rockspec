@@ -6,7 +6,7 @@ source = {
 description = {
    summary = "A test/spec library for Lua.",
    detailed = [[
-      Telescope is an in-progress test/spec library for Lua.
+      Telescope is a test/spec library for Lua.
    ]],
    license = "MIT/X11",
    homepage = "http://telescope.luaforge.net"
