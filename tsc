@@ -45,6 +45,14 @@ local function luacov_report()
      table.insert(names, filename)
   end
 
+  local escapes = {
+    [">"] = "&gt;",
+    ["<"] = "&lt;"
+  }
+  local function escape_html(str)
+    return str:gsub("[<>]", function(a) return escapes[a] end)
+  end
+
   table.sort(names)
 
   for _, filename in ipairs(names) do
@@ -65,8 +73,6 @@ local function luacov_report()
         while true do
            local line = file:read("*l")
            if not line then break end
-           line = string.gsub(line, ">", "&gt;")
-           line = string.gsub(line, "<", "&lt;")
            if line:match("^%s*%-%-") then -- Comment line
 
            elseif line:match("^%s*$")    -- Empty line
@@ -76,13 +82,13 @@ local function luacov_report()
              or line:match("^%s*}%s*$") -- Single closing brace
              or line:match("^#!") -- Unix hash-bang magic line
            then
-              report:write("<li><pre>", string.format("%-4d", line_nr), "      ", line, "</pre></li>", "\n")
+              report:write("<li><pre>", string.format("%-4d", line_nr), "      ", escape_html(line), "</pre></li>", "\n")
            else
               local hits = filedata[line_nr]
               local class = "uncovered"
               if not hits then hits = 0 end
               if hits > 0 then class = "covered" end
-              report:write("<li>", " <pre ", "class='", class, "'>", string.format("%-4d", line_nr), string.format("%-4d", hits), "&nbsp;", line, "</pre></li>", "\n")
+              report:write("<li>", " <pre ", "class='", class, "'>", string.format("%-4d", line_nr), string.format("%-4d", hits), "&nbsp;", escape_html(line), "</pre></li>", "\n")
            end
            line_nr = line_nr + 1
         end
