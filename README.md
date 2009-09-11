@@ -8,6 +8,7 @@ tests with nested contexts.
 * Nestable test contexts/descriptions.
 * [BDD](http://en.wikipedia.org/wiki/Behavior_Driven_Development)-style test names.
 * Before/after functions per context.
+* Integrated code coverage reports using [Luacov](http://luacov.luaforge.net/).
 * Easily add your own assertions.
 * Many different formatting options for tests and reports.
 * Simple, [well documented API](http://telescope.luaforge.net/docs/modules/telescope.html) makes it easy to extend/hack.

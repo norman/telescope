@@ -2,7 +2,7 @@
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
 -- project homepage at: <a href="http://telescope.luaforge.net/">http://telescope.luaforge.net</a>.
--- @release 0.3
+-- @release 0.4
 module('telescope', package.seeall)
 
 --- The status codes that can be returned by an invoked test. These should not be overidden.
@@ -33,6 +33,7 @@ status_codes = {
 -- @field status_codes.pass        'P'
 -- @field status_codes.pending     '?'
 -- @field status_codes.unassertive 'U'
+
 status_labels = {
   [status_codes.err]         = 'E',
   [status_codes.fail]        = 'F',
@@ -308,6 +309,15 @@ end
 -- Callbacks can be used, for example, to drop into a debugger upon a failed
 -- assertion or error, for profiling, or updating a GUI progress meter.
 -- </p>
+-- @param test_filter A function to filter tests that match only conditions that you specify.
+-- <p>
+-- For example, the folling would allow you to run only tests whose name matches a pattern:
+-- </p>
+-- <p>
+-- <code>
+-- function(t) return t.name:match("%s* lexer") end
+-- </code>
+-- </p>
 -- @return A table of result tables. Each result table has the following
 -- fields:
 -- <ul>
@@ -320,11 +330,12 @@ end
 -- </ul>
 -- @see load_contexts
 -- @see status_codes
-function run(contexts, callbacks)
+function run(contexts, callbacks, test_filter)
 
   local results = {}
   local env = getfenv()
   local status_names = invert_table(status_codes)
+  local test_filter = test_filter or function(a) return a end
 
   for k, v in pairs(assertions) do
     setfenv(v, env)
@@ -358,7 +369,7 @@ function run(contexts, callbacks)
     end
   end
 
-  for i, v in filter(contexts, function(i, v) return v.test end) do
+  for i, v in filter(contexts, function(i, v) return v.test and test_filter(v) end) do
     local ancestors = ancestors(i, contexts)
     local context_name = 'Top level'
     if contexts[i].parent ~= 0 then
@@ -431,7 +442,7 @@ function test_report(contexts, results)
     if item.context then
       if level == 0 then add_divider() end
       table.insert(buffer, string.format(context_name_format, space() .. name .. ':'))
-    else
+    elseif results[i] then
       table.insert(buffer, string.format(function_name_format, space() .. name) ..
         string.format(status_format, results[i].status_label))
     end

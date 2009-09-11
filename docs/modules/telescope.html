@@ -57,7 +57,7 @@
 
 
 
-<p><small><b>Release:</b> 0.2</small></p>
+<p><small><b>Release:</b> 0.4</small></p>
 
 
 
@@ -95,7 +95,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#run">run</a>&nbsp;(contexts, callbacks)</td>
+	<td class="name" nowrap><a href="#run">run</a>&nbsp;(contexts, callbacks, test_filter)</td>
 	<td class="summary">Run all tests.</td>
 	</tr>
 
@@ -358,7 +358,7 @@ Create a custom assertion. This creates an assertion along with a corresponding 
 
 
 
-<dt><a name="run"></a><strong>run</strong>&nbsp;(contexts, callbacks)</dt>
+<dt><a name="run"></a><strong>run</strong>&nbsp;(contexts, callbacks, test_filter)</dt>
 <dd>
 Run all tests. This function will exectute each function in the contexts table.
 
@@ -372,6 +372,10 @@ Run all tests. This function will exectute each function in the contexts table.
 	
 	<li>
 	  callbacks: A table of callback functions to be invoked before or after various test states. <p> There is a callback for each test <tt>status_code</tt>, and callbacks to run before or after each test invocation regardless of outcome. </p> <ul> <li>after - will be invoked after each test</li> <li>before - will be invoked before each test</li> <li>err - will be invoked after each test which results in an error</li> <li>fail - will be invoked after each failing test</li> <li>pass - will be invoked after each passing test</li> <li>pending - will be invoked after each pending test</li> <li>unassertive - will be invoked after each test which doesn't assert anything</li> </ul> <p> Callbacks can be used, for example, to drop into a debugger upon a failed assertion or error, for profiling, or updating a GUI progress meter. </p>
+	</li>
+	
+	<li>
+	  test_filter: A function to filter tests that match only conditions that you specify. <p> For example, the folling would allow you to run only tests whose name matches a pattern: </p> <p> <code> function(t) return t.name:match("%s* lexer") end </code> </p>
 	</li>
 	
 </ul>
