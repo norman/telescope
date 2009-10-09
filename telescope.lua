@@ -134,11 +134,17 @@ assertions = {}
 -- @see assertions
 function make_assertion(name, message, func)
   local neg_message = string.gsub(message, " to be ", " not to be ")
+  local num_vars = 0
+  -- if the last vararg ends up nil, we'll need to pad the table with nils so
+  -- that string.format gets the number of args it expects
+  for _, _ in message:gmatch("%%s") do num_vars = num_vars + 1 end
   local function format_message(message, ...)
     local a = {}
-    for _, v in ipairs({...}) do
-      table.insert(a, tostring(v))
+    local args = {...}
+    for i = 1, #args do
+      table.insert(a, tostring(args[i]))
     end
+    while #a ~= num_vars do table.insert(a, 'nil') end
     return string.format(assertion_message_prefix .. message, unpack(a))
   end
   assertions["assert_" .. name] = function(...)
