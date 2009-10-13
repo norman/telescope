@@ -1,6 +1,7 @@
 #!/usr/bin/env lua
 require 'luarocks.require'
 require 'telescope'
+pcall(require, "shake")
 
 local function luacov_report()
   local luacov = require("luacov.stats")
@@ -253,7 +254,11 @@ for _, callback in ipairs(callback_args) do
 end
 
 local contexts = {}
-for _, file in ipairs(files) do telescope.load_contexts(file, contexts) end
+if opts["shake"] then
+  for _, file in ipairs(files) do shake.load_contexts(file, contexts) end
+else
+  for _, file in ipairs(files) do telescope.load_contexts(file, contexts) end
+end
 
 local buffer = {}
 local results = telescope.run(contexts, callbacks, test_pattern)
