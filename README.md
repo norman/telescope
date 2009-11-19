@@ -159,6 +159,35 @@ You can see all the available command-line options, and some examples by running
     -- call "tsc" on the command line with a callback to generate a custom report
     tsc --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
 
+## Integration with Shake ##
+
+Telescope and [Shake](http://github.com/keplerproject/shake) are currently being
+merged into a single test library, which will keep the name "Shake." Shake
+allows you to write elegant, clean unit tests using only Lua's assert function
+and an operator. For example, consider the following "traditional" Unit test
+code, followed by its Shake equivalents:
+
+    -- old school
+    assert_equal(a, b)
+    assert_greater_than(a, b)
+
+    -- Shake-style
+    assert(a == b)
+    assert(a > b)
+
+At the moment, it is already possible to run Shake tests inside Telescope if you
+install the latest Shake from Github:
+
+    luarocks build http://github.com/keplerproject/shake/raw/master/rockspecs/shake-cvs-1.rockspec
+
+To then run your Shake tests, pass the `--shake` argument to tsc:
+
+    tsc --shake test.lua
+
+The new version of Telescope/Shake will allow you to mix-and-match full-blown
+Unit test/spec syntax and simple Shake-style syntax depending on how you want to
+organize your tests.
+
 ## Author ##
 
 [Norman Clarke](mailto:norman@njclarke.com)
