@@ -47,11 +47,11 @@ status_labels = {
 -- @name context_aliases
 -- @class table
 context_aliases = {"context", "describe", "spec"}
---- The default names for test blocks. It defaults to "test," "it", "expect" and
--- "should."
+--- The default names for test blocks. It defaults to "test," "it", "expect",
+-- "they" and "should."
 -- @name test_aliases
 -- @class table
-test_aliases    = {"test", "it", "expect", "should"}
+test_aliases    = {"test", "it", "expect", "should", "they"}
 
 --- The default names for "before" blocks. It defaults to "before" and "setup."
 -- The function in the before block will be run before each sibling test function
