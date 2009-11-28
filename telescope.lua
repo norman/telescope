@@ -437,7 +437,7 @@ function test_report(contexts, results)
   local function add_divider()
     table.insert(buffer, string.rep(line_char, width))
   end
-
+  add_divider()
   for i, item in ipairs(contexts) do
     local ancestors = ancestors(i, contexts)
     previous_level = level or 0
@@ -446,7 +446,6 @@ function test_report(contexts, results)
     local name = truncate_string(item.name, width - status_format_len - 4 - #ancestors, '...')
     if previous_level ~= level and level == 0 then add_divider() end
     if item.context then
-      if level == 0 then add_divider() end
       table.insert(buffer, string.format(context_name_format, space() .. name .. ':'))
     elseif results[i] then
       table.insert(buffer, string.format(function_name_format, space() .. name) ..
