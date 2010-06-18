@@ -144,7 +144,7 @@ function make_assertion(name, message, func)
     for i = 1, #args do
       table.insert(a, tostring(args[i]))
     end
-    while #a ~= num_vars do table.insert(a, 'nil') end
+    while num_vars > 0 and #a ~= num_vars do table.insert(a, 'nil') end
     return string.format(assertion_message_prefix .. message, unpack(a))
   end
   assertions["assert_" .. name] = function(...)
