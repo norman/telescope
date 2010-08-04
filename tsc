@@ -251,7 +251,7 @@ local callback_args = { "after", "before", "err", "fail", "pass",
   "pending", "unassertive" }
 for _, callback in ipairs(callback_args) do
   if opts[callback] then
-    add_callback(callback, loadstring('return ' .. opts[callback])())
+    add_callback(callback, loadstring(opts[callback])())
   end
 end
 
