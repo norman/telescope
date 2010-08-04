@@ -1,7 +1,3 @@
-require 'luarocks.require'
-require 'telescope'
-
-
 describe("Telescope spec", function()
 
   local contexts
