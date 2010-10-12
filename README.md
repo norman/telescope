@@ -1,9 +1,9 @@
-# Telescope #
+# Telescope
 
-A highly customizable test library for Lua that allows for declarative
-tests with nested contexts.
+A highly customizable test library for Lua that allows for declarative tests
+with nested contexts.
 
-## Features ##
+## Features
 
 * Nestable test contexts/descriptions.
 * [BDD](http://en.wikipedia.org/wiki/Behavior_Driven_Development)-style test names.
@@ -14,12 +14,8 @@ tests with nested contexts.
 * Simple, [well documented API](http://telescope.luaforge.net/docs/modules/telescope.html) makes it easy to extend/hack.
 * Command line runner allows you to input Lua snippet callbacks, so you can, for example,
   drop to a debugger on failed tests, or wrap test calls around a profiler, etc.
-* *Extremely* fast. So fast that it doesn't include a progress meter, because for most
-  projects it's completely pointless. You can easily add a progress meter using callbacks,
-  though, if you want one.
-* Main library is less than 300 lines of code.
 
-## An Example ##
+## An Example
 
     context("A context", function()
       before(function() end)
@@ -39,24 +35,25 @@ tests with nested contexts.
       end)
     end)
 
-## Getting it ##
+## Getting it
 
-Telescope is in early beta, but is usable. I am using it for several
-personal projects.
+You can install telescope using Luarocks:
 
-You can use Luarocks to install the latest release from the [git repository](http://github.com/norman/telescope):
+    sudo luarocks install telescope
 
-    sudo luarocks build telescope --from=http://luarocks.luaforge.net/rocks-cvs/
+You can also use Luarocks to install the latest development code from the [git
+repository](http://github.com/norman/telescope):
+
+    sudo luarocks build http://github.com/norman/telescope/raw/master/rockspecs/telescope-scm-1.rockspec
 
 If you want to work on the source code, you can clone the git repository from:
 
     git://github.com/norman/telescope.git
 
 
-## Running your tests ##
+## Running your tests
 
-Telescope currently comes with a very basic command-line test runner,
-called "tsc", which is installed by Luarocks. Simply run:
+Telescope currently comes with a command-line test runner named `tsc`. Simply run:
 
     tsc my_test_file.lua
 
@@ -101,18 +98,18 @@ how many passed, how many failed, how many produced errors, how many provided
 a name but no implementation, and how many didn't assert anything. In the event
 of any failures or errors, it shows you stack traces.
 
-You can customize the test output to be as verbose or silent as you want, and easily
-write your own test reporters - the source is well documented.
+You can customize the test output to be as verbose or silent as you want, and
+easily write your own test reporters - the source is well documented.
 
-You can pass in snippets of Lua code on the command line to run as callbacks for
-various test success/failure scenarios, and easily customize the output or use
-Telescope with other applications.
+You can pass in snippets of Lua code on the command line to run as callbacks
+for various test success/failure scenarios, and easily customize the output or
+  use Telescope with other applications.
 
 You can see all the available command-line options, and some examples by running:
 
     tsc -h
 
-### More Examples ###
+### More Examples
 
     -- Tests can be outside of contexts, if you want
     test("A test with no context", function()
@@ -133,7 +130,7 @@ You can see all the available command-line options, and some examples by running
       end)
     end)
 
-### Even More Examples ###
+### Even More Examples
 
     -- change the name of your test or context blocks if you want something
     -- different
@@ -159,36 +156,14 @@ You can see all the available command-line options, and some examples by running
     -- call "tsc" on the command line with a callback to generate a custom report
     tsc --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
 
-## Integration with Shake ##
+## Future Development
 
-Telescope and [Shake](http://github.com/keplerproject/shake) are currently being
-merged into a single test library, which will keep the name "Shake." Shake
-allows you to write elegant, clean unit tests using only Lua's assert function
-and an operator. For example, consider the following "traditional" Unit test
-code, followed by its Shake equivalents:
+Telescope may eventually be merged with [Shake](http://shake.luaforge.net/) to
+allow developers to get better reports from very simple, dependency-free tests.
+At the moment, you can already run Shake tests inside Telescope if you use
+Shake's [current git master branch](http://github.com/keplerproject/shake).
 
-    -- old school
-    assert_equal(a, b)
-    assert_greater_than(a, b)
-
-    -- Shake-style
-    assert(a == b)
-    assert(a > b)
-
-At the moment, it is already possible to run Shake tests inside Telescope if you
-install the latest Shake from Github:
-
-    luarocks build http://github.com/keplerproject/shake/raw/master/rockspecs/shake-cvs-1.rockspec
-
-To then run your Shake tests, pass the `--shake` argument to tsc:
-
-    tsc --shake test.lua
-
-The new version of Telescope/Shake will allow you to mix-and-match full-blown
-Unit test/spec syntax and simple Shake-style syntax depending on how you want to
-organize your tests.
-
-## Author ##
+## Author
 
 [Norman Clarke](mailto:norman@njclarke.com)
 
@@ -212,8 +187,20 @@ The MIT License
 
 Copyright (c) 2009 [Norman Clarke](mailto:norman@njclarke.com)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
