@@ -1,9 +1,23 @@
+local _G           = _G
+local assert       = assert
+local getfenv      = getfenv
+local io           = io
+local ipairs       = ipairs
+local loadfile     = loadfile
+local next         = next
+local pairs        = pairs
+local require      = require
+local setfenv      = setfenv
+local setmetatable = setmetatable
+local table        = table
+local type         = type
+
 --- Telescope is a test library for Lua that allows for flexible, declarative
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
 -- project homepage at: <a href="http://github.com/norman/telescope">http://github.com/norman/telescope</a>.
 -- @release 0.4
-module('telescope', package.seeall)
+module 'telescope'
 
 --- The status codes that can be returned by an invoked test. These should not be overidden.
 -- @name status_codes
@@ -133,7 +147,7 @@ assertions = {}
 -- return a == b end)</tt>
 -- @see assertions
 function make_assertion(name, message, func)
-  local neg_message = string.gsub(message, " to be ", " not to be ")
+  local neg_message = message:gsub(" to be ", " not to be ")
   local num_vars = 0
   -- if the last vararg ends up nil, we'll need to pad the table with nils so
   -- that string.format gets the number of args it expects
@@ -145,7 +159,7 @@ function make_assertion(name, message, func)
       table.insert(a, tostring(args[i]))
     end
     while num_vars > 0 and #a ~= num_vars do table.insert(a, 'nil') end
-    return string.format(assertion_message_prefix .. message, unpack(a))
+    return (assertion_message_prefix .. message):format(unpack(a))
   end
   assertions["assert_" .. name] = function(...)
     if assertion_callback then assertion_callback(...) end
@@ -176,10 +190,10 @@ end
 -- @param len The desired length.
 -- @param after A string to append to s, if it is truncated.
 local function truncate_string(s, len, after)
-  if string.len(s) <= len then
+  if #s <= len then
     return s
   else
-    local s = string.gsub(string.sub(s, 1, len), "%s*$", '')
+    local s = s:sub(1, len):gsub("%s*$", '')
     if after then return s .. after else return s end
   end
 end
@@ -224,7 +238,7 @@ make_assertion("greater_than", "'%s' to be greater than '%s'",             funct
 make_assertion("gte",          "'%s' to be greater than or equal to '%s'", function(a, b) return a >= b end)
 make_assertion("less_than",    "'%s' to be less than '%s'",                function(a, b) return a < b end)
 make_assertion("lte",          "'%s' to be less than or equal to '%s'",    function(a, b) return a <= b end)
-make_assertion("match",        "'%s' to be a match for %s",                function(a, b) return string.match(b, a) end)
+make_assertion("match",        "'%s' to be a match for %s",                function(a, b) return (tostring(b)):match(a) end)
 make_assertion("nil",          "'%s' to be nil",                           function(a) return a == nil end)
 make_assertion("true",         "'%s' to be true",                          function(a) return a == true end)
 make_assertion("type",         "'%s' to be a %s",                          function(a, b) return type(a) == b end)
@@ -278,18 +292,15 @@ function load_contexts(path, contexts)
     context_table[current_index].after = func
   end
 
-  for _, v in ipairs(after_aliases) do env[v] = after_block end
-  for _, v in ipairs(before_aliases) do env[v] = before_block end
+  for _, v in ipairs(after_aliases)   do env[v] = after_block end
+  for _, v in ipairs(before_aliases)  do env[v] = before_block end
   for _, v in ipairs(context_aliases) do env[v] = context_block end
-  for _, v in ipairs(test_aliases) do env[v] = test_block end
+  for _, v in ipairs(test_aliases)    do env[v] = test_block end
 
-  assert(io.input(path))
-  io.close()
-  local func = loadfile(path)
-  setfenv(func, env)
-  func()
+  setmetatable(env, {__index = _G})
+  local func = assert(loadfile(path))
+  setfenv(func, env)()
   return context_table
-
 end
 
 --- Run all tests.
@@ -431,11 +442,11 @@ function test_report(contexts, results)
   local function_name_format = "%-" .. width - status_format_len .. "s"
 
   local function space()
-    return string.rep(leading_space, level - 1)
+    return leading_space:rep(level - 1)
   end
 
   local function add_divider()
-    table.insert(buffer, string.rep(line_char, width))
+    table.insert(buffer, line_char:rep(width))
   end
   add_divider()
   for i, item in ipairs(contexts) do
@@ -446,10 +457,10 @@ function test_report(contexts, results)
     local name = truncate_string(item.name, width - status_format_len - 4 - #ancestors, '...')
     if previous_level ~= level and level == 0 then add_divider() end
     if item.context then
-      table.insert(buffer, string.format(context_name_format, space() .. name .. ':'))
+      table.insert(buffer, context_name_format:format(space() .. name .. ':'))
     elseif results[i] then
-      table.insert(buffer, string.format(function_name_format, space() .. name) ..
-        string.format(status_format, results[i].status_label))
+      table.insert(buffer, function_name_format:format(space() .. name) ..
+        status_format:format(results[i].status_label))
     end
   end
   add_divider()
@@ -503,9 +514,9 @@ function summary_report(contexts, results)
     local number = r[k]
     local label = k
     if number == 1 then
-      label = string.gsub(label, "s$", "")
+      label = label:gsub("s$", "")
     end
-    table.insert(buffer, string.format("%d %s", number, label))
+    table.insert(buffer, ("%d %s"):format(number, label))
   end
   return table.concat(buffer, " "), r
 end
