@@ -11,7 +11,7 @@ with nested contexts.
 * Integrated code coverage reports using [Luacov](http://luacov.luaforge.net/).
 * Easily add your own assertions.
 * Many different formatting options for tests and reports.
-* Simple, [well documented API](http://telescope.luaforge.net/docs/modules/telescope.html) makes it easy to extend/hack.
+* Simple, [well documented API](http://norman.github.com/telescope/files/telescope.html) makes it easy to extend/hack.
 * Command line runner allows you to input Lua snippet callbacks, so you can, for example,
   drop to a debugger on failed tests, or wrap test calls around a profiler, etc.
 
@@ -185,7 +185,7 @@ name "Telescope."
 
 The MIT License
 
-Copyright (c) 2009 [Norman Clarke](mailto:norman@njclarke.com)
+Copyright (c) 2009-2010 [Norman Clarke](mailto:norman@njclarke.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
