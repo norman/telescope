@@ -298,7 +298,8 @@ function load_contexts(path, contexts)
   for _, v in ipairs(test_aliases)    do env[v] = test_block end
 
   setmetatable(env, {__index = _G})
-  local func = assert(loadfile(path))
+  local func, err = assert(loadfile(path))
+  if err then error(err) end
   setfenv(func, env)()
   return context_table
 end
