@@ -147,30 +147,29 @@ assertions = {}
 -- return a == b end)</tt>
 -- @see assertions
 function make_assertion(name, message, func)
-  local neg_message = message:gsub(" to be ", " not to be ")
   local num_vars = 0
   -- if the last vararg ends up nil, we'll need to pad the table with nils so
   -- that string.format gets the number of args it expects
-  for _, _ in message:gmatch("%%s") do num_vars = num_vars + 1 end
-  local function format_message(message, ...)
-    local a = {}
-    local args = {...}
-    for i = 1, #args do
-      table.insert(a, tostring(args[i]))
+  local format_message
+  if type(message) == "function" then
+    format_message = message
+  else
+    for _, _ in message:gmatch("%%s") do num_vars = num_vars + 1 end
+    format_message = function(message, ...)
+      local a = {}
+      local args = {...}
+      for i = 1, #args do
+        table.insert(a, tostring(args[i]))
+      end
+      while num_vars > 0 and #a ~= num_vars do table.insert(a, 'nil') end
+      return (assertion_message_prefix .. message):format(unpack(a))
     end
-    while num_vars > 0 and #a ~= num_vars do table.insert(a, 'nil') end
-    return (assertion_message_prefix .. message):format(unpack(a))
   end
+
   assertions["assert_" .. name] = function(...)
     if assertion_callback then assertion_callback(...) end
     if not func(...) then
       error({format_message(message, ...), debug.traceback()})
-    end
-  end
-  assertions["assert_not_" .. name] = function(...)
-    if assertion_callback then assertion_callback(...) end
-    if func(...) then
-      error({format_message(neg_message, ...), debug.traceback()})
     end
   end
 end
@@ -242,6 +241,14 @@ make_assertion("match",        "'%s' to be a match for %s",                funct
 make_assertion("nil",          "'%s' to be nil",                           function(a) return a == nil end)
 make_assertion("true",         "'%s' to be true",                          function(a) return a == true end)
 make_assertion("type",         "'%s' to be a %s",                          function(a, b) return type(a) == b end)
+
+make_assertion("not_blank",    "'%s' not to be blank",                     function(a) return a ~= '' and a ~= nil end)
+make_assertion("not_empty",    "'%s' not to be an empty table",            function(a) return not not next(a) end)
+make_assertion("not_equal",    "'%s' not to be equal to '%s'",             function(a, b) return a ~= b end)
+make_assertion("not_error",    "result not to be an error",                function(f) return not not pcall(f) end)
+make_assertion("not_match",    "'%s' not to be a match for %s",            function(a, b) return not (tostring(b)):match(a) end)
+make_assertion("not_nil",      "'%s' not to be nil",                       function(a) return a ~= nil end)
+make_assertion("not_type",     "'%s' not to be a %s",                      function(a, b) return type(a) ~= b end)
 
 --- Build a contexts table from the test file given in <tt>path</tt>.
 -- If the optional <tt>contexts</tt> table argument is provided, then the
