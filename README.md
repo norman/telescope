@@ -1,7 +1,7 @@
 # Telescope
 
-A highly customizable test library for Lua that allows for declarative tests
-with nested contexts.
+Telescope is a highly customizable test library for Lua that allows for
+declarative tests with nested contexts.
 
 ## Features
 
@@ -41,19 +41,17 @@ You can install telescope using Luarocks:
 
     sudo luarocks install telescope
 
-You can also use Luarocks to install the latest development code from the [git
-repository](http://github.com/norman/telescope):
+You can also check out the source code from Git, and  install via "make" if you
+prefer.
 
-    sudo luarocks build http://github.com/norman/telescope/raw/master/rockspecs/telescope-scm-1.rockspec
+The source code can be found at:
 
-If you want to work on the source code, you can clone the git repository from:
-
-    git://github.com/norman/telescope.git
+    http://github.com/norman/telescope
 
 
 ## Running your tests
 
-Telescope currently comes with a command-line test runner named `tsc`. Simply run:
+Telescope comes with a command-line test runner named `tsc`. Simply run:
 
     tsc my_test_file.lua
 
@@ -155,13 +153,6 @@ You can see all the available command-line options, and some examples by running
 
     -- call "tsc" on the command line with a callback to generate a custom report
     tsc --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
-
-## Future Development
-
-Telescope may eventually be merged with [Shake](http://shake.luaforge.net/) to
-allow developers to get better reports from very simple, dependency-free tests.
-At the moment, you can already run Shake tests inside Telescope if you use
-Shake's [current git master branch](http://github.com/keplerproject/shake).
 
 ## Author
 

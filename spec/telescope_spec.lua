@@ -1,3 +1,5 @@
+local telescope = require "telescope"
+
 describe("Telescope spec", function()
 
   local contexts
