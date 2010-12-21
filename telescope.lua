@@ -19,6 +19,8 @@ local type         = type
 -- @release 0.4
 module 'telescope'
 
+version = "0.5.0"
+
 --- The status codes that can be returned by an invoked test. These should not be overidden.
 -- @name status_codes
 -- @class table

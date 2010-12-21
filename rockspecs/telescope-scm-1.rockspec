@@ -9,10 +9,11 @@ description = {
       Telescope is a test/spec library for Lua.
    ]],
    license = "MIT/X11",
-   homepage = "http://telescope.luaforge.net"
+   homepage = "http://norman.github.com/telescope"
 }
 dependencies = {
    "lua >= 5.1"
+   "penlight >= 0.9.0"
 }
 
 build = {
