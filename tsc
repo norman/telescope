@@ -144,7 +144,7 @@ end
 
 local function show_usage()
   local text = [[
-Telescope v 0.3
+Telescope v 0.4.1
 
 Usage: tsc [options] [files]
 
