@@ -66,6 +66,19 @@ describe("Telescope spec", function()
 
     end)
 
+    context("load_context", function()
+
+      it("should accept a function or a path to a module", function()
+        func, err = assert(loadfile("spec/fixtures/syntax.lua"))
+        contexts = load_contexts(func)
+        -- We don't need to validate the entire thing, that's done in Syntax.
+        -- Just make sure that the result is a context.
+        assert_equal("A context", contexts[1].name)
+        assert_equal("A passing test", contexts[3].name)
+      end)
+    
+    end)
+
   end)
 
 end)
