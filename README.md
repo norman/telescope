@@ -1,15 +1,15 @@
 # Telescope
 
-A highly customizable test library for Lua that allows for declarative tests
-with nested contexts.
+Telescope is a highly customizable test library for Lua that allows for
+declarative tests with nested contexts.
 
 ## Features
 
 * Nestable test contexts/descriptions.
-* [BDD](http://en.wikipedia.org/wiki/Behavior_Driven_Development)-style test names.
+* [BDD](http://en.wikipedia.org/wiki/Behavior_Driven_Development)-style spec names.
 * Before/after functions per context.
 * Integrated code coverage reports using [Luacov](http://luacov.luaforge.net/).
-* Easily add your own assertions.
+* You can easily add your own assertions.
 * Many different formatting options for tests and reports.
 * Simple, [well documented API](http://norman.github.com/telescope/files/telescope.html) makes it easy to extend/hack.
 * Command line runner allows you to input Lua snippet callbacks, so you can, for example,
@@ -37,23 +37,26 @@ with nested contexts.
 
 ## Getting it
 
-You can install telescope using Luarocks:
+You can install Telescope using Luarocks:
 
     sudo luarocks install telescope
 
-You can also use Luarocks to install the latest development code from the [git
-repository](http://github.com/norman/telescope):
+You can also check out the source code from Git, and  install via "make" if you
+prefer:
 
-    sudo luarocks build http://github.com/norman/telescope/raw/master/rockspecs/telescope-scm-1.rockspec
+    git clone git://github.com/norman/telescope.git
+    cd telescope
+    make install
 
-If you want to work on the source code, you can clone the git repository from:
 
-    git://github.com/norman/telescope.git
+The source code can be found at:
+
+    https://github.com/norman/telescope
 
 
 ## Running your tests
 
-Telescope currently comes with a command-line test runner named `tsc`. Simply run:
+Telescope comes with a command-line test runner named `tsc`. Simply run:
 
     tsc my_test_file.lua
 
@@ -156,13 +159,6 @@ You can see all the available command-line options, and some examples by running
     -- call "tsc" on the command line with a callback to generate a custom report
     tsc --after="function(t) print(t.status_label, t.name, t.context) end" example.lua
 
-## Future Development
-
-Telescope may eventually be merged with [Shake](http://shake.luaforge.net/) to
-allow developers to get better reports from very simple, dependency-free tests.
-At the moment, you can already run Shake tests inside Telescope if you use
-Shake's [current git master branch](http://github.com/keplerproject/shake).
-
 ## Author
 
 [Norman Clarke](mailto:norman@njclarke.com)
@@ -171,21 +167,21 @@ Please feel free to email me bug reports or feature requests.
 
 ## Acknowledgements
 
-Telescope's initial beta release was made on Aug 25, 2009 - the 400th anniversary
-of the invention of the telescope.
+Telescope's initial beta release was made on Aug 25, 2009 - the 400th
+anniversary of the invention of the telescope.
 
 Thanks to [ScrewUnit](http://github.com/nathansobo/screw-unit/tree/master),
 [Contest](http://github.com/citrusbyte/contest) and
 [Luaspec](http://github.com/mirven/luaspec/) for inspiration.
 
-Thanks to [Eric Knudtson](http://twitter.com/vikingux) for helping me come up with the
-name "Telescope."
+Thanks to [Eric Knudtson](http://twitter.com/vikingux) for helping me come up
+with the name "Telescope."
 
 ## License ##
 
 The MIT License
 
-Copyright (c) 2009-2010 [Norman Clarke](mailto:norman@njclarke.com)
+Copyright (c) 2009-2011 [Norman Clarke](mailto:norman@njclarke.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
