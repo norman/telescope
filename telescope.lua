@@ -251,7 +251,7 @@ make_assertion("not_match",    "'%s' not to be a match for %s",            funct
 make_assertion("not_nil",      "'%s' not to be nil",                       function(a) return a ~= nil end)
 make_assertion("not_type",     "'%s' not to be a %s",                      function(a, b) return type(a) ~= b end)
 
---- Build a contexts table from the test file given in <tt>path</tt>.
+--- Build a contexts table from the test file or function given in <tt>target</tt>.
 -- If the optional <tt>contexts</tt> table argument is provided, then the
 -- resulting contexts will be added to it.
 -- <p>
@@ -268,7 +268,7 @@ make_assertion("not_type",     "'%s' not to be a %s",                      funct
 -- </code>
 -- @param contexts A optional table in which to collect the resulting contexts
 -- and function.
-function load_contexts(path, contexts)
+function load_contexts(target, contexts)
 
   local env = getfenv()
   local current_index = 0
@@ -306,7 +306,7 @@ function load_contexts(path, contexts)
   for _, v in ipairs(test_aliases)    do env[v] = test_block end
 
   setmetatable(env, {__index = _G})
-  local func, err = assert(loadfile(path))
+  local func, err = type(target) == 'string' and assert(loadfile(target)) or target
   if err then error(err) end
   setfenv(func, env)()
   return context_table
