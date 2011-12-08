@@ -1,3 +1,5 @@
+local telescope = require "telescope"
+
 describe("Telescope spec", function()
 
   local contexts
@@ -70,7 +72,7 @@ describe("Telescope spec", function()
 
       it("should accept a function or a path to a module", function()
         func, err = assert(loadfile("spec/fixtures/syntax.lua"))
-        contexts = load_contexts(func)
+        contexts = telescope.load_contexts(func)
         -- We don't need to validate the entire thing, that's done in Syntax.
         -- Just make sure that the result is a context.
         assert_equal("A context", contexts[1].name)
