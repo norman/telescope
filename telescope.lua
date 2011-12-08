@@ -158,6 +158,7 @@ function make_assertion(name, message, func)
     format_message = function(message, ...)
       local a = {}
       local args = {...}
+      -- @TODO look into using select("#", ...)
       for i = 1, #args do
         table.insert(a, tostring(args[i]))
       end
