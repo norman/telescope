@@ -16,8 +16,15 @@ local type         = type
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
 -- project homepage at: <a href="http://github.com/norman/telescope">http://github.com/norman/telescope</a>.
--- @release 0.4
+-- @release 0.5
+-- @class module
+-- @name telescope
+
+--[[
 module 'telescope'
+--]]
+
+local version = "0.5.0"
 
 --- The status codes that can be returned by an invoked test. These should not be overidden.
 -- @name status_codes
