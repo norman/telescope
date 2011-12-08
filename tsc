@@ -1,8 +1,10 @@
 #!/usr/bin/env lua
-package.path = './?.lua;' .. package.path
-pcall(require, "luarocks.require")
 local telescope = require 'telescope'
+
+pcall(require, "luarocks.require")
 pcall(require, "shake")
+
+package.path = "./?.lua;" .. package.path
 
 local function luacov_report()
   local luacov = require("luacov.stats")

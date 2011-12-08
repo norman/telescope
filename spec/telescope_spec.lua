@@ -78,7 +78,7 @@ describe("Telescope spec", function()
         assert_equal("A context", contexts[1].name)
         assert_equal("A passing test", contexts[3].name)
       end)
-    
+
     end)
 
   end)
