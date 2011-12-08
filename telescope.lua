@@ -1,17 +1,3 @@
-local _G           = _G
-local assert       = assert
-local getfenv      = getfenv
-local io           = io
-local ipairs       = ipairs
-local loadfile     = loadfile
-local next         = next
-local pairs        = pairs
-local require      = require
-local setfenv      = setfenv
-local setmetatable = setmetatable
-local table        = table
-local type         = type
-
 --- Telescope is a test library for Lua that allows for flexible, declarative
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
@@ -36,7 +22,7 @@ local version = "0.5.0"
 -- @field pending - This is returned when a test does not have a corresponding function.
 -- @field unassertive - This is returned when an invoked test does not produce
 -- errors, but does not contain any assertions.
-status_codes = {
+local status_codes = {
   err         = 2,
   fail        = 4,
   pass        = 8,
@@ -55,7 +41,7 @@ status_codes = {
 -- @field status_codes.pending     '?'
 -- @field status_codes.unassertive 'U'
 
-status_labels = {
+local status_labels = {
   [status_codes.err]         = 'E',
   [status_codes.fail]        = 'F',
   [status_codes.pass]        = 'P',
@@ -67,29 +53,29 @@ status_labels = {
 -- "describe."
 -- @name context_aliases
 -- @class table
-context_aliases = {"context", "describe", "spec"}
+local context_aliases = {"context", "describe", "spec"}
 --- The default names for test blocks. It defaults to "test," "it", "expect",
 -- "they" and "should."
 -- @name test_aliases
 -- @class table
-test_aliases    = {"test", "it", "expect", "should", "they"}
+local test_aliases    = {"test", "it", "expect", "should", "they"}
 
 --- The default names for "before" blocks. It defaults to "before" and "setup."
 -- The function in the before block will be run before each sibling test function
 -- or context.
 -- @name before_aliases
 -- @class table
-before_aliases  = {"before", "setup"}
+local before_aliases  = {"before", "setup"}
 
 --- The default names for "after" blocks. It defaults to "after" and "teardown."
 -- The function in the after block will be run after each sibling test function
 -- or context.
 -- @name after_aliases
 -- @class table
-after_aliases  = {"after", "teardown"}
+local after_aliases  = {"after", "teardown"}
 
 -- Prefix to place before all assertion messages. Used by make_assertion().
-assertion_message_prefix  = "Assert failed: expected "
+local assertion_message_prefix  = "Assert failed: expected "
 
 --- The default assertions.
 -- These are the assertions built into telescope. You can override them or
@@ -125,7 +111,7 @@ assertion_message_prefix  = "Assert failed: expected "
 -- @see make_assertion
 -- @name assertions
 -- @class table
-assertions = {}
+local assertions = {}
 
 --- Create a custom assertion.
 -- This creates an assertion along with a corresponding negative assertion. It
@@ -153,7 +139,7 @@ assertions = {}
 -- @usage <tt>make_assertion("equal", "%s to be equal to %s", function(a, b)
 -- return a == b end)</tt>
 -- @see assertions
-function make_assertion(name, message, func)
+local function make_assertion(name, message, func)
   local num_vars = 0
   -- if the last vararg ends up nil, we'll need to pad the table with nils so
   -- that string.format gets the number of args it expects
@@ -275,8 +261,7 @@ make_assertion("not_type",     "'%s' not to be a %s",                      funct
 -- </code>
 -- @param contexts A optional table in which to collect the resulting contexts
 -- and function.
-function load_contexts(target, contexts)
-
+local function load_contexts(target, contexts)
   local env = getfenv()
   local current_index = 0
   local context_table = contexts or {}
@@ -363,7 +348,7 @@ end
 -- </ul>
 -- @see load_contexts
 -- @see status_codes
-function run(contexts, callbacks, test_filter)
+local function run(contexts, callbacks, test_filter)
 
   local results = {}
   local env = getfenv()
@@ -444,7 +429,7 @@ end
 --- Return a detailed report for each context, with the status of each test.
 -- @param contexts The contexts returned by <tt>load_contexts</tt>.
 -- @param results The results returned by <tt>run</tt>.
-function test_report(contexts, results)
+local function test_report(contexts, results)
 
   local buffer               = {}
   local leading_space        = "  "
@@ -487,7 +472,7 @@ end
 --- Return a table of stack traces for tests which produced a failure or an error.
 -- @param contexts The contexts returned by <tt>load_contexts</tt>.
 -- @param results The results returned by <tt>run</tt>.
-function error_report(contexts, results)
+local function error_report(contexts, results)
   local buffer = {}
   for _, r in filter(results, function(i, r) return r.message end) do
     local name = contexts[r.test].name
@@ -505,7 +490,7 @@ end
 -- <tt>pending</tt>, <tt>tests</tt>, <tt>unassertive</tt>.
 -- @param contexts The contexts returned by <tt>load_contexts</tt>.
 -- @param results The results returned by <tt>run</tt>.
-function summary_report(contexts, results)
+local function summary_report(contexts, results)
   local r = {
     assertions  = 0,
     errors      = 0,
@@ -536,3 +521,20 @@ function summary_report(contexts, results)
   end
   return table.concat(buffer, " "), r
 end
+
+local telescope = {
+  after_aliases            = after_aliases,
+  assertion_message_prefix = assertion_message_prefix,
+  before_aliases           = before_aliases,
+  context_aliases          = context_aliases,
+  error_report             = error_report,
+  load_contexts            = load_contexts,
+  run                      = run,
+  status_codes             = status_codes,
+  status_labels            = status_labels,
+  summary_report           = summary_report,
+  test_aliases             = test_aliases,
+  version                  = version
+}
+
+return telescope
