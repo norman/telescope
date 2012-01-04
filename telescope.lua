@@ -158,10 +158,13 @@ function make_assertion(name, message, func)
     format_message = function(message, ...)
       local a = {}
       local args = {...}
-      for i = 1, #args do
-        table.insert(a, tostring(args[i]))
+      if #args > num_vars then
+        error(string.format('assert_%s expected %d arguments but got %d', name, num_vars, #args))
       end
-      while num_vars > 0 and #a ~= num_vars do table.insert(a, 'nil') end
+      for _,v in ipairs(args) do
+        table.insert(a, tostring(v))
+      end
+      while num_vars > 0 and #a < num_vars do table.insert(a, 'nil') end
       return (assertion_message_prefix .. message):format(unpack(a))
     end
   end
