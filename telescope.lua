@@ -158,7 +158,7 @@ local function make_assertion(name, message, func)
       for _,v in ipairs(args) do
         table.insert(a, tostring(v))
       end
-      while num_vars > 0 and #a < num_vars do table.insert(a, 'nil') end
+      while #a < num_vars do table.insert(a, 'nil') end
       return (assertion_message_prefix .. message):format(unpack(a))
     end
   end
