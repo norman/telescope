@@ -161,7 +161,7 @@ function make_assertion(name, message, func)
       if #args > num_vars then
         error(string.format('assert_%s expected %d arguments but got %d', name, num_vars, #args))
       end
-      for _,v in ipairs(args) do
+      for _, v in ipairs(args) do
         table.insert(a, tostring(v))
       end
       while #a < num_vars do table.insert(a, 'nil') end
