@@ -375,7 +375,7 @@ local function run(contexts, callbacks, test_filter)
       assertions_invoked = assertions_invoked + 1
     end
     setfenv(func, env)
-    local result, message = pcall(func)
+    local result, message = xpcall(func, debug.traceback)
     if result and assertions_invoked > 0 then
       return status_codes.pass, assertions_invoked, nil
     elseif result then
