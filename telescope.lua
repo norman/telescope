@@ -527,6 +527,7 @@ end
 
 local telescope = {
   after_aliases            = after_aliases,
+  make_assertion           = make_assertion,
   assertion_message_prefix = assertion_message_prefix,
   before_aliases           = before_aliases,
   context_aliases          = context_aliases,
