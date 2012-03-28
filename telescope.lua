@@ -534,6 +534,7 @@ local telescope = {
   error_report             = error_report,
   load_contexts            = load_contexts,
   run                      = run,
+  test_report              = test_report,
   status_codes             = status_codes,
   status_labels            = status_labels,
   summary_report           = summary_report,
