@@ -1,3 +1,8 @@
+local compat = require 'compat'
+
+_G.getfenv = _G.getfenv or compat.getfenv
+_G.setfenv = _G.setfenv or compat.setfenv
+
 --- Telescope is a test library for Lua that allows for flexible, declarative
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
