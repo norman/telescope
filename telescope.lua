@@ -1,19 +1,16 @@
-local compat = require 'compat'
-
-_G.getfenv = _G.getfenv or compat.getfenv
-_G.setfenv = _G.setfenv or compat.setfenv
-
 --- Telescope is a test library for Lua that allows for flexible, declarative
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
 -- project homepage at: <a href="http://github.com/norman/telescope">http://github.com/norman/telescope</a>.
 -- @release 0.5
 -- @class module
--- @name telescope
+-- @module 'telescope'
 
---[[
-module 'telescope'
---]]
+local compat = require 'compat'
+
+_G.getfenv = _G.getfenv or compat.getfenv
+_G.setfenv = _G.setfenv or compat.setfenv
+
 
 local version = "0.5.0"
 
@@ -143,7 +140,7 @@ local assertions = {}
 -- </p>
 -- @usage <tt>make_assertion("equal", "%s to be equal to %s", function(a, b)
 -- return a == b end)</tt>
--- @see assertions
+-- @function make_assertion
 local function make_assertion(name, message, func)
   local num_vars = 0
   -- if the last vararg ends up nil, we'll need to pad the table with nils so
@@ -269,6 +266,7 @@ make_assertion("not_type",     "'%s' not to be a %s",                      funct
 -- </code>
 -- @param contexts A optional table in which to collect the resulting contexts
 -- and function.
+-- @function load_contexts
 local function load_contexts(target, contexts)
   local env = getfenv()
   local current_index = 0
@@ -356,6 +354,7 @@ end
 -- </ul>
 -- @see load_contexts
 -- @see status_codes
+-- @function run
 local function run(contexts, callbacks, test_filter)
 
   local results = {}
@@ -437,6 +436,7 @@ end
 --- Return a detailed report for each context, with the status of each test.
 -- @param contexts The contexts returned by <tt>load_contexts</tt>.
 -- @param results The results returned by <tt>run</tt>.
+-- @function test_report
 local function test_report(contexts, results)
 
   local buffer               = {}
@@ -480,6 +480,7 @@ end
 --- Return a table of stack traces for tests which produced a failure or an error.
 -- @param contexts The contexts returned by <tt>load_contexts</tt>.
 -- @param results The results returned by <tt>run</tt>.
+-- @function error_report
 local function error_report(contexts, results)
   local buffer = {}
   for _, r in filter(results, function(i, r) return r.message end) do
@@ -498,6 +499,7 @@ end
 -- <tt>pending</tt>, <tt>tests</tt>, <tt>unassertive</tt>.
 -- @param contexts The contexts returned by <tt>load_contexts</tt>.
 -- @param results The results returned by <tt>run</tt>.
+-- @function summary_report
 local function summary_report(contexts, results)
   local r = {
     assertions  = 0,

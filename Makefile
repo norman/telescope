@@ -8,7 +8,7 @@ test:
 	@./tsc spec/*.lua
 
 docs: clean
-	luadoc -d docs -r README.md --nofiles telescope.lua
+	ldoc.lua -t "Telescope API Docs" telescope.lua
 
 clean:
 	rm -rf docs

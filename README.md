@@ -11,7 +11,7 @@ declarative tests with nested contexts.
 * Integrated code coverage reports using [Luacov](http://luacov.luaforge.net/).
 * You can easily add your own assertions.
 * Many different formatting options for tests and reports.
-* Simple, [well documented API](http://norman.github.com/telescope/files/telescope.html) makes it easy to extend/hack.
+* Simple, well documented API makes it easy to extend/hack.
 * Command line runner allows you to input Lua snippet callbacks, so you can, for example,
   drop to a debugger on failed tests, or wrap test calls around a profiler, etc.
 
