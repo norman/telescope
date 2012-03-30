@@ -5,6 +5,7 @@ declarative tests with nested contexts.
 
 ## Features
 
+* Compatible with Lua 5.1 and 5.2.
 * Nestable test contexts/descriptions.
 * [BDD](http://en.wikipedia.org/wiki/Behavior_Driven_Development)-style spec names.
 * Before/after functions per context.
@@ -48,6 +49,8 @@ prefer:
     cd telescope
     make install
 
+Note that compatibility with Lua 5.2 has recently been added, but is not yet in
+Luarocks. If you want support for 5.2, for now please install via make.
 
 The source code can be found at:
 
@@ -181,7 +184,7 @@ with the name "Telescope."
 
 The MIT License
 
-Copyright (c) 2009-2011 [Norman Clarke](mailto:norman@njclarke.com)
+Copyright (c) 2009-2012 [Norman Clarke](mailto:norman@njclarke.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
