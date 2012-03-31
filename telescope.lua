@@ -6,10 +6,10 @@
 -- @class module
 -- @module 'telescope'
 
-local compat = require 'compat'
+local compat_env = require 'compat'
 
-_G.getfenv = _G.getfenv or compat.getfenv
-_G.setfenv = _G.setfenv or compat.setfenv
+local getfenv = _G.getfenv or compat_env.getfenv
+local setfenv = _G.setfenv or compat_env.setfenv
 
 
 local version = "0.5.0"
