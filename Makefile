@@ -5,11 +5,11 @@ LUA_SHARE = $(LUA_DIR)/share/lua/$(LUA_VERSION)
 
 .PHONY : test clean docs install uninstall
 
-test:
-	@./tsc spec/*.lua
-
 spec:
 	@./tsc -f spec/*.lua
+
+test:
+	@./tsc spec/*.lua
 
 docs: clean
 	ldoc.lua -t "Telescope API Docs" telescope.lua
