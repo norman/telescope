@@ -12,7 +12,7 @@ local getfenv = _G.getfenv or compat_env.getfenv
 local setfenv = _G.setfenv or compat_env.setfenv
 
 
-local version = "0.5.0"
+local _VERSION = "0.5.0"
 
 --- The status codes that can be returned by an invoked test. These should not be overidden.
 -- @name status_codes
@@ -546,7 +546,8 @@ local telescope = {
   status_labels            = status_labels,
   summary_report           = summary_report,
   test_aliases             = test_aliases,
-  version                  = version
+  version                  = _VERSION,
+  _VERSION                 = _VERSION
 }
 
 return telescope

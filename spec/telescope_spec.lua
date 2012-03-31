@@ -1,10 +1,19 @@
 local telescope = require "telescope"
 
-describe("Telescope spec", function()
+describe("The Telescope Test Framework", function()
 
   local contexts
 
-  context("Syntax", function()
+  context("The Telescope module", function()
+    it("should have a 'version' member", function()
+      assert_equal("string", type(telescope.version))
+    end)
+    it("should have a '_VERSION' member", function()
+      assert_equal("string", type(telescope._VERSION))
+    end)
+  end)
+
+  context("Telescope's syntax", function()
 
     before(function()
       contexts = telescope.load_contexts("spec/fixtures/syntax.lua")
