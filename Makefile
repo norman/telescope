@@ -20,6 +20,7 @@ clean:
 install:
 	@mkdir -p $(LUA_SHARE)
 	cp telescope.lua $(LUA_SHARE)
+	cp compat_env.lua $(LUA_SHARE)
 	cp tsc $(LUA_DIR)/bin
 
 uninstall:

@@ -6,7 +6,7 @@
 -- @class module
 -- @module 'telescope'
 
-local compat_env = require 'compat'
+local compat_env = require 'compat_env'
 
 local getfenv = _G.getfenv or compat_env.getfenv
 local setfenv = _G.setfenv or compat_env.setfenv

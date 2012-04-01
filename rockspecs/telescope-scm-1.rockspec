@@ -20,6 +20,7 @@ build = {
   install = {
     lua = {
       "telescope.lua",
+      "compat_env.lua",
     },
     bin = {
       "tsc"
