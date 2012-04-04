@@ -1,7 +1,7 @@
 --- Telescope is a test library for Lua that allows for flexible, declarative
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
--- project homepage at: <a href="http://github.com/norman/telescope">http://github.com/norman/telescope</a>.
+-- project homepage at: <a href="http://github.com/norman/telescope">http://github.com/norman/telescope#readme</a>.
 -- @release 0.5
 -- @class module
 -- @module 'telescope'
