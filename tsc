@@ -146,7 +146,7 @@ end
 
 local function show_usage()
   local text = [[
-Telescope v 0.4.1
+Telescope
 
 Usage: tsc [options] [files]
 
@@ -160,6 +160,7 @@ Options:
   -q,     --quiet           Show don't show any stack traces
   -s      --silent          Don't show any output
   -h,-?   --help            Show this text
+  -v      --version         Show version
   -c      --luacov          Output a coverage file using Luacov (http://luacov.luaforge.net/)
           --load=<file>     Load a Lua file before executing command
           --name=<pattern>  Only run tests whose name matches a Lua string pattern
@@ -234,6 +235,11 @@ local opts, files = process_args()
 if opts["h"] or opts["?"] or opts["help"] or not (next(opts) or next(files)) then
   show_usage()
   os.exit()
+end
+
+if opts.v or opts.version then
+  print(telescope.version)
+  os.exit(0)
 end
 
 if opts.c or opts.luacov then
