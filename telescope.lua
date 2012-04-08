@@ -268,7 +268,7 @@ make_assertion("not_type",     "'%s' not to be a %s",                      funct
 -- and function.
 -- @function load_contexts
 local function load_contexts(target, contexts)
-  local env = getfenv()
+  local env = {}
   local current_index = 0
   local context_table = contexts or {}
 
