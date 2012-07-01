@@ -5,6 +5,7 @@
 -- @release 0.5
 -- @class module
 -- @module 'telescope'
+local _M = {}
 
 local compat_env = require 'telescope.compat_env'
 
@@ -303,7 +304,15 @@ local function load_contexts(target, contexts)
   for _, v in ipairs(context_aliases) do env[v] = context_block end
   for _, v in ipairs(test_aliases)    do env[v] = test_block end
 
+  -- Set these functions in the module's meta table to allow accessing
+  -- telescope's test and context functions without env tricks. This will
+  -- however add tests to a context table used inside the module, so multiple
+  -- test files will add tests to the same top-level context, which may or may
+  -- not be desired.
+  setmetatable(_M, {__index = env})
+
   setmetatable(env, {__index = _G})
+
   local func, err = type(target) == 'string' and assert(loadfile(target)) or target
   if err then error(err) end
   setfenv(func, env)()
@@ -532,22 +541,20 @@ local function summary_report(contexts, results)
   return table.concat(buffer, " "), r
 end
 
-local telescope = {
-  after_aliases            = after_aliases,
-  make_assertion           = make_assertion,
-  assertion_message_prefix = assertion_message_prefix,
-  before_aliases           = before_aliases,
-  context_aliases          = context_aliases,
-  error_report             = error_report,
-  load_contexts            = load_contexts,
-  run                      = run,
-  test_report              = test_report,
-  status_codes             = status_codes,
-  status_labels            = status_labels,
-  summary_report           = summary_report,
-  test_aliases             = test_aliases,
-  version                  = _VERSION,
-  _VERSION                 = _VERSION
-}
+_M.after_aliases            = after_aliases
+_M.make_assertion           = make_assertion
+_M.assertion_message_prefix = assertion_message_prefix
+_M.before_aliases           = before_aliases
+_M.context_aliases          = context_aliases
+_M.error_report             = error_report
+_M.load_contexts            = load_contexts
+_M.run                      = run
+_M.test_report              = test_report
+_M.status_codes             = status_codes
+_M.status_labels            = status_labels
+_M.summary_report           = summary_report
+_M.test_aliases             = test_aliases
+_M.version                  = _VERSION
+_M._VERSION                 = _VERSION
 
-return telescope
+return _M
