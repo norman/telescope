@@ -367,14 +367,26 @@ end
 local function run(contexts, callbacks, test_filter)
 
   local results = {}
-  local env = getfenv()
   local status_names = invert_table(status_codes)
   local test_filter = test_filter or function(a) return a end
 
-  for k, v in pairs(assertions) do
-    setfenv(v, env)
-    env[k] = v
+  -- Setup a new environment suitable for running a new test
+  local function newEnv()
+    local env = {}
+
+    -- Make sure globals are accessible in the new environment
+    setmetatable(env, {__index = _G})
+
+    -- Setup all the assert functions in the new environment
+    for k, v in pairs(assertions) do
+      setfenv(v, env)
+      env[k] = v
+    end
+
+    return env
   end
+
+  local env = newEnv()
 
   local function invoke_callback(name, test)
     if not callbacks then return end
@@ -404,6 +416,8 @@ local function run(contexts, callbacks, test_filter)
   end
 
   for i, v in filter(contexts, function(i, v) return v.test and test_filter(v) end) do
+    env = newEnv()    -- Setup a new environment for this test
+
     local ancestors = ancestors(i, contexts)
     local context_name = 'Top level'
     if contexts[i].parent ~= 0 then
@@ -418,10 +432,15 @@ local function run(contexts, callbacks, test_filter)
     table.sort(ancestors)
     -- this "before" is the test callback passed into the runner
     invoke_callback("before", result)
-    -- this "before" is the "before" block in the test.
+    
+    -- run all the "before" blocks/functions
     for _, a in ipairs(ancestors) do
-      if contexts[a].before then contexts[a].before() end
+      if contexts[a].before then 
+        setfenv(contexts[a].before, env)
+        contexts[a].before() 
+      end
     end
+
     -- check if it's a function because pending tests will just have "true"
     if type(v.test) == "function" then
       result.status_code, result.assertions_invoked, result.message = invoke_test(v.test)
@@ -431,9 +450,15 @@ local function run(contexts, callbacks, test_filter)
       invoke_callback("pending", result)
     end
     result.status_label = status_labels[result.status_code]
+
+    -- Run all the "after" blocks/functions
     for _, a in ipairs(ancestors) do
-      if contexts[a].after then contexts[a].after() end
+      if contexts[a].after then 
+        setfenv(contexts[a].after, env)
+        contexts[a].after() 
+      end
     end
+
     invoke_callback("after", result)
     results[i] = result
   end
