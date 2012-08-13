@@ -319,6 +319,14 @@ local function load_contexts(target, contexts)
   return context_table
 end
 
+-- in-place table reverse.
+function table.reverse(t)
+     local len = #t+1
+     for i=1, (len-1)/2 do
+          t[i], t[len-i] = t[len-i], t[i]
+     end
+end
+
 --- Run all tests.
 -- This function will exectute each function in the contexts table.
 -- @param contexts The contexts created by <tt>load_contexts</tt>.
@@ -452,6 +460,7 @@ local function run(contexts, callbacks, test_filter)
     result.status_label = status_labels[result.status_code]
 
     -- Run all the "after" blocks/functions
+    table.reverse(ancestors)
     for _, a in ipairs(ancestors) do
       if contexts[a].after then 
         setfenv(contexts[a].after, env)
