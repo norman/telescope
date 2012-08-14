@@ -156,7 +156,13 @@ local function make_assertion(name, message, func)
       local args = {...}
       -- @TODO look into using select("#", ...)
       if #args > num_vars then
-        error(string.format('assert_%s expected %d arguments but got %d', name, num_vars, #args))
+        
+        local userErrorMessage = args[num_vars+1]
+        if type(userErrorMessage) == "string" then
+          return(assertion_message_prefix .. userErrorMessage)
+        else
+          error(string.format('assert_%s expected %d arguments but got %d', name, num_vars, #args))
+        end
       end
       for _, v in ipairs(args) do
         table.insert(a, tostring(v))
