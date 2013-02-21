@@ -49,14 +49,6 @@ prefer:
     cd telescope
     make install
 
-Note that compatibility with Lua 5.2 has recently been added, but is not yet in
-Luarocks. If you want support for 5.2, for now please install via make.
-
-The source code can be found at:
-
-    https://github.com/norman/telescope
-
-
 ## Running your tests
 
 Telescope comes with a command-line test runner named `tsc`. Simply run:
