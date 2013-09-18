@@ -1,0 +1,543 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Telescope API Docs</title>
+    <link rel="stylesheet" href="ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul>
+  <li><strong>telescope</strong></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>telescope</code></h1>
+
+<p>Telescope is a test library for Lua that allows for flexible, declarative
+ tests.</p>
+<p> The documentation produced here is intended largely for developers
+ working on Telescope.  For information on using Telescope, please visit the
+ project homepage at: <a href="http://github.com/norman/telescope">http://github.com/norman/telescope#readme</a>.</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Release</strong>: 0.6</li>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#make_assertion">make_assertion&nbsp;(name, message, func)</a></td>
+	<td class="summary">Create a custom assertion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#load_contexts">load_contexts&nbsp;(contexts)</a></td>
+	<td class="summary">Build a contexts table from the test file or function given in <tt>target</tt>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#run">run&nbsp;(contexts, callbacks, test_filter)</a></td>
+	<td class="summary">Run all tests.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#test_report">test_report&nbsp;(contexts, results)</a></td>
+	<td class="summary">Return a detailed report for each context, with the status of each test.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#error_report">error_report&nbsp;(contexts, results)</a></td>
+	<td class="summary">Return a table of stack traces for tests which produced a failure or an error.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#summary_report">summary_report&nbsp;(contexts, results)</a></td>
+	<td class="summary">Get a one-line report and a summary table with the status counts.</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#status_codes">status_codes</a></td>
+	<td class="summary">The status codes that can be returned by an invoked test.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#status_labels">status_labels</a></td>
+	<td class="summary">Labels used to show the various <tt>status_codes</tt> as a single character.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#context_aliases">context_aliases</a></td>
+	<td class="summary">The default names for context blocks.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#test_aliases">test_aliases</a></td>
+	<td class="summary">The default names for test blocks.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#before_aliases">before_aliases</a></td>
+	<td class="summary">The default names for "before" blocks.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#after_aliases">after_aliases</a></td>
+	<td class="summary">The default names for "after" blocks.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#assertions">assertions</a></td>
+	<td class="summary">The default assertions.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2><a name="Functions"></a>Functions</h2>
+    <dl class="function">
+    <dt>
+    <a name = "make_assertion"></a>
+    <strong>make_assertion&nbsp;(name, message, func)</strong>
+    </dt>
+    <dd>
+    Create a custom assertion.
+ This creates an assertion along with a corresponding negative assertion. It
+ is used internally by telescope to create the default assertions.
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+         The base name of the assertion.
+ <p>
+ The name will be used as the basis of the positive and negative assertions;
+ i.e., the name <tt>equal</tt> would be used to create the assertions
+ <tt>assert_equal</tt> and <tt>assert_not_equal</tt>.
+ </p></li>
+        <li><span class="parameter">message</span>
+         The base message that will be shown.
+ <p>
+ The assertion message is what is shown when the assertion fails.  It will be
+ prefixed with the string in <tt>telescope.assertion_message_prefix</tt>.
+ The variables passed to <tt>telescope.make_assertion</tt> are interpolated
+ in the message string using <tt>string.format</tt>.  When creating the
+ inverse assertion, the message is reused, with <tt>" to be "</tt> replaced
+ by <tt>" not to be "</tt>. Hence a recommended format is something like:
+ <tt>"%s to be similar to %s"</tt>.
+ </p></li>
+        <li><span class="parameter">func</span>
+         The assertion function itself.
+ <p>
+ The assertion function can have any number of arguments.
+ </p></li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">&lt;tt&gt;make_assertion(<span class="string">"equal"</span>, <span class="string">"%s to be equal to %s"</span>, <span class="keyword">function</span>(a, b)
+ <span class="keyword">return</span> a == b <span class="keyword">end</span>)&lt;/tt&gt;</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "load_contexts"></a>
+    <strong>load_contexts&nbsp;(contexts)</strong>
+    </dt>
+    <dd>
+    Build a contexts table from the test file or function given in <tt>target</tt>.
+ If the optional <tt>contexts</tt> table argument is provided, then the
+ resulting contexts will be added to it.
+ <p>
+ The resulting contexts table's structure is as follows:
+ </p>
+ <code>
+ {
+   {parent = 0, name = "this is a context", context = true},
+   {parent = 1, name = "this is a nested context", context = true},
+   {parent = 2, name = "this is a test", test = function},
+   {parent = 2, name = "this is another test", test = function},
+   {parent = 0, name = "this is test outside any context", test = function},
+ }
+ </code>
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">contexts</span>
+         A optional table in which to collect the resulting contexts
+ and function.</li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "run"></a>
+    <strong>run&nbsp;(contexts, callbacks, test_filter)</strong>
+    </dt>
+    <dd>
+    Run all tests.
+ This function will exectute each function in the contexts table.
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">contexts</span>
+         The contexts created by <tt>load_contexts</tt>.</li>
+        <li><span class="parameter">callbacks</span>
+         A table of callback functions to be invoked before or after
+ various test states.
+ <p>
+ There is a callback for each test <tt>status_code</tt>, and callbacks to run
+ before or after each test invocation regardless of outcome.
+ </p>
+ <ul>
+ <li>after - will be invoked after each test</li>
+ <li>before - will be invoked before each test</li>
+ <li>err - will be invoked after each test which results in an error</li>
+ <li>fail - will be invoked after each failing test</li>
+ <li>pass - will be invoked after each passing test</li>
+ <li>pending - will be invoked after each pending test</li>
+ <li>unassertive - will be invoked after each test which doesn't assert
+ anything</li>
+ </ul>
+ <p>
+ Callbacks can be used, for example, to drop into a debugger upon a failed
+ assertion or error, for profiling, or updating a GUI progress meter.
+ </p></li>
+        <li><span class="parameter">test_filter</span>
+         A function to filter tests that match only conditions that you specify.
+ <p>
+ For example, the folling would allow you to run only tests whose name matches a pattern:
+ </p>
+ <p>
+ <code>
+ function(t) return t.name:match("%s* lexer") end
+ </code>
+ </p></li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+         A table of result tables. Each result table has the following
+ fields:
+ <ul>
+ <li>assertions_invoked - the number of assertions the test invoked</li>
+ <li>context            - the name of the context</li>
+ <li>message            - a table with an error message and stack trace</li>
+ <li>name               - the name of the test</li>
+ <li>status_code        - the resulting status code</li>
+ <li>status_label       - the label for the status_code</li>
+ </ul>
+    </ol>
+
+
+    <h3>see also:</h3>
+    <ul>
+         <li><a href="index.html#load_contexts">load_contexts</a></li>
+         <li><a href="index.html#status_codes">status_codes</a></li>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "test_report"></a>
+    <strong>test_report&nbsp;(contexts, results)</strong>
+    </dt>
+    <dd>
+    Return a detailed report for each context, with the status of each test.
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">contexts</span>
+         The contexts returned by <tt>load_contexts</tt>.</li>
+        <li><span class="parameter">results</span>
+         The results returned by <tt>run</tt>.</li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "error_report"></a>
+    <strong>error_report&nbsp;(contexts, results)</strong>
+    </dt>
+    <dd>
+    Return a table of stack traces for tests which produced a failure or an error.
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">contexts</span>
+         The contexts returned by <tt>load_contexts</tt>.</li>
+        <li><span class="parameter">results</span>
+         The results returned by <tt>run</tt>.</li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "summary_report"></a>
+    <strong>summary_report&nbsp;(contexts, results)</strong>
+    </dt>
+    <dd>
+    Get a one-line report and a summary table with the status counts.  The
+ counts given are: total tests, assertions, passed tests, failed tests,
+ pending tests, and tests which didn't assert anything.
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">contexts</span>
+         The contexts returned by <tt>load_contexts</tt>.</li>
+        <li><span class="parameter">results</span>
+         The results returned by <tt>run</tt>.</li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+        A report that can be printed</li>
+        <li>
+         A table with the various counts. Its fields are:
+ <tt>assertions</tt>, <tt>errors</tt>, <tt>failed</tt>, <tt>passed</tt>,
+ <tt>pending</tt>, <tt>tests</tt>, <tt>unassertive</tt>.</li>
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2><a name="Tables"></a>Tables</h2>
+    <dl class="function">
+    <dt>
+    <a name = "status_codes"></a>
+    <strong>status_codes</strong>
+    </dt>
+    <dd>
+    The status codes that can be returned by an invoked test.  These should not be overidden.
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">err</span>
+         - This is returned when an invoked test results in an error
+ rather than a passed or failed assertion.</li>
+        <li><span class="parameter">fail</span>
+         - This is returned when an invoked test contains one or more failing assertions.</li>
+        <li><span class="parameter">pass</span>
+         - This is returned when all of a test's assertions pass.</li>
+        <li><span class="parameter">pending</span>
+         - This is returned when a test does not have a corresponding function.</li>
+        <li><span class="parameter">unassertive</span>
+         - This is returned when an invoked test does not produce
+ errors, but does not contain any assertions.</li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "status_labels"></a>
+    <strong>status_labels</strong>
+    </dt>
+    <dd>
+    Labels used to show the various <tt>status_codes</tt> as a single character.
+ These can be overidden if you wish.
+
+
+
+
+    <h3>see also:</h3>
+    <ul>
+         <a href="index.html#status_codes">status_codes</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "context_aliases"></a>
+    <strong>context_aliases</strong>
+    </dt>
+    <dd>
+    The default names for context blocks.  It defaults to "context", "spec" and
+ "describe."
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">context</span>
+        </li>
+        <li><span class="parameter">describe</span>
+        </li>
+        <li><span class="parameter">spec</span>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "test_aliases"></a>
+    <strong>test_aliases</strong>
+    </dt>
+    <dd>
+    The default names for test blocks.  It defaults to "test," "it", "expect",
+ "they" and "should."
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">test</span>
+        </li>
+        <li><span class="parameter">it</span>
+        </li>
+        <li><span class="parameter">expect</span>
+        </li>
+        <li><span class="parameter">should</span>
+        </li>
+        <li><span class="parameter">they</span>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "before_aliases"></a>
+    <strong>before_aliases</strong>
+    </dt>
+    <dd>
+    The default names for "before" blocks.  It defaults to "before" and "setup."
+ The function in the before block will be run before each sibling test function
+ or context.
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">before</span>
+        </li>
+        <li><span class="parameter">setup</span>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "after_aliases"></a>
+    <strong>after_aliases</strong>
+    </dt>
+    <dd>
+    The default names for "after" blocks.  It defaults to "after" and "teardown."
+ The function in the after block will be run after each sibling test function
+ or context.
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">after</span>
+        </li>
+        <li><span class="parameter">teardown</span>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "assertions"></a>
+    <strong>assertions</strong>
+    </dt>
+    <dd>
+    The default assertions.
+ These are the assertions built into telescope. You can override them or
+ create your own custom assertions using <tt>make_assertion</tt>.
+ <ul>
+ <tt><li>assert_blank(a)</tt> - true if a is nil, or the empty string</li>
+ <tt><li>assert_empty(a)</tt> - true if a is an empty table</li>
+ <tt><li>assert_equal(a, b)</tt> - true if a == b</li>
+ <tt><li>assert_error(f)</tt> - true if function f produces an error</li>
+ <tt><li>assert_false(a)</tt> - true if a is false</li>
+ <tt><li>assert_greater_than(a, b)</tt> - true if a > b</li>
+ <tt><li>assert_gte(a, b)</tt> - true if a >= b</li>
+ <tt><li>assert_less_than(a, b)</tt> - true if a < b</li>
+ <tt><li>assert_lte(a, b)</tt> - true if a <= b</li>
+ <tt><li>assert_match(a, b)</tt> - true if b is a string that matches pattern a</li>
+ <tt><li>assert_nil(a)</tt> - true if a is nil</li>
+ <tt><li>assert_true(a)</tt> - true if a is true</li>
+ <tt><li>assert_type(a, b)</tt> - true if a is of type b</li>
+ <tt><li>assert_not_blank(a)</tt>  - true if a is not nil and a is not the empty string</li>
+ <tt><li>assert_not_empty(a)</tt> - true if a is a table, and a is not empty</li>
+ <tt><li>assert_not_equal(a, b)</tt> - true if a ~= b</li>
+ <tt><li>assert_not_error(f)</tt> - true if function f does not produce an error</li>
+ <tt><li>assert_not_false(a)</tt> - true if a is not false</li>
+ <tt><li>assert_not_greater_than(a, b)</tt> - true if not (a > b)</li>
+ <tt><li>assert_not_gte(a, b)</tt> - true if not (a >= b)</li>
+ <tt><li>assert_not_less_than(a, b)</tt> - true if not (a < b)</li>
+ <tt><li>assert_not_lte(a, b)</tt> - true if not (a <= b)</li>
+ <tt><li>assert_not_match(a, b)</tt> - true if the string b does not match the pattern a</li>
+ <tt><li>assert_not_nil(a)</tt> - true if a is not nil</li>
+ <tt><li>assert_not_true(a)</tt> - true if a is not true</li>
+ <tt><li>assert_not_type(a, b)</tt> - true if a is not of type b</li>
+ </ul>
+
+
+
+
+    <h3>see also:</h3>
+    <ul>
+         <a href="index.html#make_assertion">make_assertion</a>
+    </ul>
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.3.12</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
