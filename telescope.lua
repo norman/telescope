@@ -2,7 +2,7 @@
 -- tests. The documentation produced here is intended largely for developers
 -- working on Telescope.  For information on using Telescope, please visit the
 -- project homepage at: <a href="http://github.com/norman/telescope">http://github.com/norman/telescope#readme</a>.
--- @release 0.5
+-- @release 0.6
 -- @class module
 -- @module 'telescope'
 local _M = {}
@@ -13,7 +13,7 @@ local getfenv = _G.getfenv or compat_env.getfenv
 local setfenv = _G.setfenv or compat_env.setfenv
 
 
-local _VERSION = "0.5.0"
+local _VERSION = "0.6.0"
 
 --- The status codes that can be returned by an invoked test. These should not be overidden.
 -- @name status_codes
@@ -155,8 +155,13 @@ local function make_assertion(name, message, func)
       local a = {}
       local args = {...}
       local nargs = select('#', ...)
-      if nargs > num_vars then
-        error(string.format('assert_%s expected %d arguments but got %d', name, num_vars, #args))
+      if nargs > num_vars then        
+        local userErrorMessage = args[num_vars+1]
+        if type(userErrorMessage) == "string" then
+          return(assertion_message_prefix .. userErrorMessage)
+        else
+          error(string.format('assert_%s expected %d arguments but got %d', name, num_vars, #args))
+        end
       end
       for i = 1, nargs do a[i] = tostring(v) end
       for i = nargs+1, num_vars do a[i] = 'nil' end
@@ -317,6 +322,14 @@ local function load_contexts(target, contexts)
   return context_table
 end
 
+-- in-place table reverse.
+function table.reverse(t)
+     local len = #t+1
+     for i=1, (len-1)/2 do
+          t[i], t[len-i] = t[len-i], t[i]
+     end
+end
+
 --- Run all tests.
 -- This function will exectute each function in the contexts table.
 -- @param contexts The contexts created by <tt>load_contexts</tt>.
@@ -365,14 +378,26 @@ end
 local function run(contexts, callbacks, test_filter)
 
   local results = {}
-  local env = getfenv()
   local status_names = invert_table(status_codes)
   local test_filter = test_filter or function(a) return a end
 
-  for k, v in pairs(assertions) do
-    setfenv(v, env)
-    env[k] = v
+  -- Setup a new environment suitable for running a new test
+  local function newEnv()
+    local env = {}
+
+    -- Make sure globals are accessible in the new environment
+    setmetatable(env, {__index = _G})
+
+    -- Setup all the assert functions in the new environment
+    for k, v in pairs(assertions) do
+      setfenv(v, env)
+      env[k] = v
+    end
+
+    return env
   end
+
+  local env = newEnv()
 
   local function invoke_callback(name, test)
     if not callbacks then return end
@@ -402,6 +427,8 @@ local function run(contexts, callbacks, test_filter)
   end
 
   for i, v in filter(contexts, function(i, v) return v.test and test_filter(v) end) do
+    env = newEnv()    -- Setup a new environment for this test
+
     local ancestors = ancestors(i, contexts)
     local context_name = 'Top level'
     if contexts[i].parent ~= 0 then
@@ -416,10 +443,15 @@ local function run(contexts, callbacks, test_filter)
     table.sort(ancestors)
     -- this "before" is the test callback passed into the runner
     invoke_callback("before", result)
-    -- this "before" is the "before" block in the test.
+    
+    -- run all the "before" blocks/functions
     for _, a in ipairs(ancestors) do
-      if contexts[a].before then contexts[a].before() end
+      if contexts[a].before then 
+        setfenv(contexts[a].before, env)
+        contexts[a].before() 
+      end
     end
+
     -- check if it's a function because pending tests will just have "true"
     if type(v.test) == "function" then
       result.status_code, result.assertions_invoked, result.message = invoke_test(v.test)
@@ -429,9 +461,16 @@ local function run(contexts, callbacks, test_filter)
       invoke_callback("pending", result)
     end
     result.status_label = status_labels[result.status_code]
+
+    -- Run all the "after" blocks/functions
+    table.reverse(ancestors)
     for _, a in ipairs(ancestors) do
-      if contexts[a].after then contexts[a].after() end
+      if contexts[a].after then 
+        setfenv(contexts[a].after, env)
+        contexts[a].after() 
+      end
     end
+
     invoke_callback("after", result)
     results[i] = result
   end
