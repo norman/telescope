@@ -180,7 +180,7 @@ end
 --- (local) Return a table with table t's values as keys and keys as values.
 -- @param t The table.
 local function invert_table(t)
-  t2 = {}
+  local t2 = {}
   for k, v in pairs(t) do t2[v] = k end
   return t2
 end
