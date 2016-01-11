@@ -578,12 +578,104 @@ local function summary_report(contexts, results)
   return table.concat(buffer, " "), r
 end
 
+--- Writes a detailed report with the results of each test, in JUnit XML format.
+-- Each context is converted into a test suite.
+-- @param contexts The contexts returned by <tt>load_contexts</tt>.
+-- @param results The results returned by <tt>run</tt>.
+-- @function junit_report
+local function junit_report(contexts, results)
+  local ancestor_separator = " / "
+
+  local suites = {}
+  for i, item in ipairs(contexts) do
+    if item.context then
+      local name = item.name
+      local ancestors = ancestors(i, contexts)
+      for _, ancestor in pairs(ancestors) do
+        name = contexts[ancestor].name .. ancestor_separator .. name
+      end
+
+      suites[i] = { name = name, cases = {} }
+    else
+      table.insert(suites[item.parent].cases, i)
+    end
+  end
+
+  local xml_escapes = {
+    [">"] = "&gt;",
+    ["<"] = "&lt;",
+    ['"'] = "&quot;"
+  }
+  local function escape_xml(str)
+    return str:gsub("[<>]", function(a) return xml_escapes[a] end)
+  end
+
+  local function write_test(report, test)
+    -- TODO: classname="" status=""
+    -- time: Time taken (in seconds) to execute the test
+    report:write('    <testcase name="' .. escape_xml(test.name) .. '" assertions="' .. test.assertions_invoked .. '">', "\n")
+
+    if test.status_code == status_codes.err then
+      -- <error message="my error message">my crash report</error>
+      -- TODO: message="" type=""
+      -- Contains as a text node relevant data for the error, e.g., a stack trace
+      report:write('      <error>' .. escape_xml(table.concat(test.message, "\n")) .. '</error>', "\n")
+    elseif test.status_code == status_codes.fail then
+      -- <failure message="my failure message">my stack trace</failure>
+      -- TODO: message="" type=""
+      report:write('      <failure>' .. escape_xml(table.concat(test.message, "\n")) .. '</failure>', "\n")
+    elseif test.status_code == status_codes.pass then
+    elseif test.status_code == status_codes.pending then
+      report:write('      <skipped/>', "\n")
+    elseif test.status_code == status_codes.unassertive then
+      -- Treat it like passed
+    end
+
+    -- TODO: <system-out/>
+    -- TODO: <system-err/>
+    report:write('    </testcase>', "\n")
+  end
+
+  local function write_suite(report, suite)
+      -- TODO: disabled="" id="" package="" skipped=""
+      -- timestamp: when the test was executed. Timezone may not be specified.
+      -- hostname: Host on which the tests were executed. 'localhost' should be used if the hostname cannot be determined.
+      -- failures: The total number of tests in the suite that failed. A failure is a test which the code has explicitly failed by using the mechanisms for that purpose. e.g., via an assertEquals
+      -- errors: The total number of tests in the suite that errorrd. An errored test is one that had an unanticipated problem. e.g., an unchecked throwable; or a problem with the implementation of the test.
+      -- time: Time taken (in seconds) to execute the tests in the suite
+      -- it can contain a <properties> <property name="" value="">... </properties> block
+      report:write('  <testsuite name="' .. escape_xml(suite.name) .. '" tests="' .. #suite.cases .. '">', "\n")
+
+      for _, case in ipairs(suite.cases) do
+	write_test(report, results[case])
+      end
+
+      report:write('  </testsuite>', "\n")
+  end
+
+  local report = io.open("TEST.xml", "w")
+  report:write('<?xml version="1.0" encoding="UTF-8"?>', "\n")
+  -- TODO: name="" disabled="" errors="" failures="" tests="" time=""
+  report:write('<testsuites>', "\n")
+
+  for i in ipairs(contexts) do
+    suite = suites[i]
+    if suite then
+      write_suite(report, suite)
+    end
+  end
+
+  report:write('</testsuites>', "\n")
+  report:close()
+end
+
 _M.after_aliases            = after_aliases
 _M.make_assertion           = make_assertion
 _M.assertion_message_prefix = assertion_message_prefix
 _M.before_aliases           = before_aliases
 _M.context_aliases          = context_aliases
 _M.error_report             = error_report
+_M.junit_report             = junit_report
 _M.load_contexts            = load_contexts
 _M.run                      = run
 _M.test_report              = test_report
