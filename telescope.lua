@@ -590,24 +590,10 @@ end
 -- Each context is converted into a test suite.
 -- @param contexts The contexts returned by <tt>load_contexts</tt>.
 -- @param results The results returned by <tt>run</tt>.
+-- @param file_contexts A table that associates the test filenames with the last context corresponding to it.
 -- @function junit_report
-local function junit_report(contexts, results)
+local function junit_report(contexts, results, file_contexts)
   local ancestor_separator = " / "
-
-  local suites = {}
-  for i, item in ipairs(contexts) do
-    if item.context then
-      local name = item.name
-      local ancestors = ancestors(i, contexts)
-      for _, ancestor in pairs(ancestors) do
-        name = contexts[ancestor].name .. ancestor_separator .. name
-      end
-
-      suites[i] = { name = name, cases = {} }
-    else
-      table.insert(suites[item.parent].cases, i)
-    end
-  end
 
   local xml_escapes = {
     [">"] = "&gt;",
@@ -648,36 +634,64 @@ local function junit_report(contexts, results)
   end
 
   local function write_suite(report, suite)
-      -- TODO: disabled="" id="" package="" skipped=""
-      -- timestamp: when the test was executed. Timezone may not be specified.
-      -- hostname: Host on which the tests were executed. 'localhost' should be used if the hostname cannot be determined.
-      -- failures: The total number of tests in the suite that failed. A failure is a test which the code has explicitly failed by using the mechanisms for that purpose. e.g., via an assertEquals
-      -- errors: The total number of tests in the suite that errorrd. An errored test is one that had an unanticipated problem. e.g., an unchecked throwable; or a problem with the implementation of the test.
-      -- time: Time taken (in seconds) to execute the tests in the suite
-      -- it can contain a <properties> <property name="" value="">... </properties> block
-      report:write('  <testsuite name="' .. escape_xml(suite.name) .. '" tests="' .. #suite.cases .. '">', "\n")
+    -- TODO: disabled="" id="" package="" skipped=""
+    -- timestamp: when the test was executed. Timezone may not be specified.
+    -- hostname: Host on which the tests were executed. 'localhost' should be used if the hostname cannot be determined.
+    -- failures: The total number of tests in the suite that failed. A failure is a test which the code has explicitly failed by using the mechanisms for that purpose. e.g., via an assertEquals
+    -- errors: The total number of tests in the suite that errorrd. An errored test is one that had an unanticipated problem. e.g., an unchecked throwable; or a problem with the implementation of the test.
+    -- time: Time taken (in seconds) to execute the tests in the suite
+    -- it can contain a <properties> <property name="" value="">... </properties> block
+    report:write('  <testsuite name="' .. escape_xml(suite.name) .. '" tests="' .. #suite.cases .. '">', "\n")
 
-      for _, case in ipairs(suite.cases) do
-	write_test(report, results[case])
+    for _, case in ipairs(suite.cases) do
+      write_test(report, results[case])
+    end
+
+    report:write('  </testsuite>', "\n")
+  end
+
+  local function write_file(filename, suites)
+    local report = io.open("TEST-" .. filename .. ".xml", "w")
+    report:write('<?xml version="1.0" encoding="UTF-8"?>', "\n")
+    -- TODO: disabled="" errors="" failures="" tests="" time=""
+    report:write('<testsuites name="' .. filename .. '">', "\n")
+
+    for i in ipairs(contexts) do
+      suite = suites[i]
+      if suite then
+        write_suite(report, suite)
+      end
+    end
+
+    report:write('</testsuites>', "\n")
+    report:close()
+  end
+
+
+  local i = 1
+  for _, file_info in ipairs(file_contexts) do
+    local suites = {}
+
+    while i <= file_info.last_context do
+      local item = contexts[i]
+
+      if item.context then
+        local name = item.name
+        local ancestors = ancestors(i, contexts)
+        for _, ancestor in pairs(ancestors) do
+          name = contexts[ancestor].name .. ancestor_separator .. name
+        end
+
+        suites[i] = { name = name, cases = {} }
+      else
+        table.insert(suites[item.parent].cases, i)
       end
 
-      report:write('  </testsuite>', "\n")
-  end
-
-  local report = io.open("TEST.xml", "w")
-  report:write('<?xml version="1.0" encoding="UTF-8"?>', "\n")
-  -- TODO: name="" disabled="" errors="" failures="" tests="" time=""
-  report:write('<testsuites>', "\n")
-
-  for i in ipairs(contexts) do
-    suite = suites[i]
-    if suite then
-      write_suite(report, suite)
+      i = i + 1
     end
-  end
 
-  report:write('</testsuites>', "\n")
-  report:close()
+    write_file(file_info.name, suites)
+  end
 end
 
 _M.after_aliases            = after_aliases

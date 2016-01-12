@@ -265,10 +265,11 @@ for _, callback in ipairs(callback_args) do
 end
 
 local contexts = {}
-if opts["shake"] then
-  for _, file in ipairs(files) do shake.load_contexts(file, contexts) end
-else
-  for _, file in ipairs(files) do telescope.load_contexts(file, contexts) end
+local file_contexts = {}
+local load_contexts = opts["shake"] and shake.load_contexts or telescope.load_contexts
+for _, file in ipairs(files) do
+  load_contexts(file, contexts)
+  table.insert(file_contexts, { name = string.match(file, "(.*)%."), last_context = #contexts })
 end
 
 local buffer = {}
@@ -298,7 +299,7 @@ if opts.c or opts.coverage then
 end
 
 if opts.j or opts.junit then
-  telescope.junit_report(contexts, results, summary, data)
+  telescope.junit_report(contexts, results, file_contexts)
 end
 
 for _, v in pairs(results) do
