@@ -426,6 +426,12 @@ local function run(contexts, callbacks, test_filter)
     end
   end
 
+  -- Returns the number of elapsed seconds with decimals.
+  -- TODO: On POSIX systems it returns CPU time (not what we want), on Windows it returns elapsed time
+  local function get_seconds()
+    return os.clock()
+  end
+
   for i, v in filter(contexts, function(i, v) return v.test and test_filter(v) end) do
     env = newEnv()    -- Setup a new environment for this test
 
@@ -454,7 +460,9 @@ local function run(contexts, callbacks, test_filter)
 
     -- check if it's a function because pending tests will just have "true"
     if type(v.test) == "function" then
+      result.start_time = get_seconds()
       result.status_code, result.assertions_invoked, result.message = invoke_test(v.test)
+      result.end_time = get_seconds()
       invoke_callback(status_names[result.status_code], result)
     else
       result.status_code = status_codes.pending
@@ -612,8 +620,11 @@ local function junit_report(contexts, results)
 
   local function write_test(report, test)
     -- TODO: classname="" status=""
-    -- time: Time taken (in seconds) to execute the test
-    report:write('    <testcase name="' .. escape_xml(test.name) .. '" assertions="' .. test.assertions_invoked .. '">', "\n")
+    local test_time = ""
+    if test.start_time and test.end_time then
+      test_time = ' time="' .. (test.end_time - test.start_time) .. '"'
+    end
+    report:write('    <testcase name="' .. escape_xml(test.name) .. '" assertions="' .. test.assertions_invoked .. '"' .. test_time .. '>', "\n")
 
     if test.status_code == status_codes.err then
       -- <error message="my error message">my crash report</error>
