@@ -600,10 +600,11 @@ local function junit_report(contexts, results, file_contexts, out_path)
   local xml_escapes = {
     [">"] = "&gt;",
     ["<"] = "&lt;",
+    ["&"] = "&amp;",
     ['"'] = "&quot;"
   }
   local function escape_xml(str)
-    return str:gsub("[<>]", function(a) return xml_escapes[a] end)
+    return str:gsub("[<>&\"]", function(a) return xml_escapes[a] end)
   end
 
   local function write_test(report, test)
