@@ -162,7 +162,7 @@ Options:
   -h,-?   --help            Show this text
   -v      --version         Show version
   -c      --luacov          Output a coverage file using Luacov (http://luacov.luaforge.net/)
-  -j      --junit           Generate a JUnit compatible .xml report files
+          --junit=<path>    Generate JUnit compatible .xml report files in the specified path
           --load=<file>     Load a Lua file before executing command
           --name=<pattern>  Only run tests whose name matches a Lua string pattern
           --shake           Use shake as the front-end for tests
@@ -298,8 +298,8 @@ if opts.c or opts.coverage then
   os.remove("luacov.stats.out")
 end
 
-if opts.j or opts.junit then
-  telescope.junit_report(contexts, results, file_contexts)
+if opts.junit then
+  telescope.junit_report(contexts, results, file_contexts, opts.junit)
 end
 
 for _, v in pairs(results) do

@@ -591,8 +591,10 @@ end
 -- @param contexts The contexts returned by <tt>load_contexts</tt>.
 -- @param results The results returned by <tt>run</tt>.
 -- @param file_contexts A table that associates the test filenames with the last context corresponding to it.
+-- @param out_path The path where the output files will be written
 -- @function junit_report
-local function junit_report(contexts, results, file_contexts)
+local function junit_report(contexts, results, file_contexts, out_path)
+  assert(type(out_path) == "string")
   local ancestor_separator = " / "
 
   local xml_escapes = {
@@ -650,8 +652,8 @@ local function junit_report(contexts, results, file_contexts)
     report:write('  </testsuite>', "\n")
   end
 
-  local function write_file(filename, suites)
-    local report = io.open("TEST-" .. filename .. ".xml", "w")
+  local function write_file(out_path, filename, suites)
+    local report = io.open(out_path .. "/TEST-" .. filename .. ".xml", "w")
     report:write('<?xml version="1.0" encoding="UTF-8"?>', "\n")
     -- TODO: disabled="" errors="" failures="" tests="" time=""
     report:write('<testsuites name="' .. filename .. '">', "\n")
@@ -668,6 +670,8 @@ local function junit_report(contexts, results, file_contexts)
   end
 
 
+  -- TODO: Find a portable way to create a directory
+  os.execute("mkdir " .. out_path)
   local i = 1
   for _, file_info in ipairs(file_contexts) do
     local suites = {}
@@ -690,7 +694,7 @@ local function junit_report(contexts, results, file_contexts)
       i = i + 1
     end
 
-    write_file(file_info.name, suites)
+    write_file(out_path, file_info.name, suites)
   end
 end
 
