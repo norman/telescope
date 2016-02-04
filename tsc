@@ -302,9 +302,15 @@ if opts.junit then
   telescope.junit_report(contexts, results, file_contexts, opts.junit)
 end
 
+local fail = false
 for _, v in pairs(results) do
-  if v.status_code == telescope.status_codes.err or
-    v.status_code == telescope.status_codes.fail then
+  if v.status_code == telescope.status_codes.err then
     os.exit(1)
   end
+  if v.status_code == telescope.status_codes.fail then
+    fail = true
+  end
+end
+if fail then
+  os.exit(2)
 end
