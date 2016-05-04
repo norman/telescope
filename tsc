@@ -162,6 +162,7 @@ Options:
   -h,-?   --help            Show this text
   -v      --version         Show version
   -c      --luacov          Output a coverage file using Luacov (http://luacov.luaforge.net/)
+          --junit=<path>    Generate JUnit compatible .xml report files in the specified path
           --load=<file>     Load a Lua file before executing command
           --name=<pattern>  Only run tests whose name matches a Lua string pattern
           --shake           Use shake as the front-end for tests
@@ -264,10 +265,11 @@ for _, callback in ipairs(callback_args) do
 end
 
 local contexts = {}
-if opts["shake"] then
-  for _, file in ipairs(files) do shake.load_contexts(file, contexts) end
-else
-  for _, file in ipairs(files) do telescope.load_contexts(file, contexts) end
+local file_contexts = {}
+local load_contexts = opts["shake"] and shake.load_contexts or telescope.load_contexts
+for _, file in ipairs(files) do
+  load_contexts(file, contexts)
+  table.insert(file_contexts, { name = string.match(file, "(.*)%."), last_context = #contexts })
 end
 
 local buffer = {}
@@ -296,9 +298,19 @@ if opts.c or opts.coverage then
   os.remove("luacov.stats.out")
 end
 
+if opts.junit then
+  telescope.junit_report(contexts, results, file_contexts, opts.junit)
+end
+
+local fail = false
 for _, v in pairs(results) do
-  if v.status_code == telescope.status_codes.err or
-    v.status_code == telescope.status_codes.fail then
+  if v.status_code == telescope.status_codes.err then
     os.exit(1)
   end
+  if v.status_code == telescope.status_codes.fail then
+    fail = true
+  end
+end
+if fail then
+  os.exit(2)
 end
