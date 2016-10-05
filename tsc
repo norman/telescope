@@ -161,6 +161,7 @@ Options:
   -s      --silent          Don't show any output
   -h,-?   --help            Show this text
   -v      --version         Show version
+  -C      --color           Use console colors in report
   -c      --luacov          Output a coverage file using Luacov (http://luacov.luaforge.net/)
           --load=<file>     Load a Lua file before executing command
           --name=<pattern>  Only run tests whose name matches a Lua string pattern
@@ -272,10 +273,10 @@ end
 
 local buffer = {}
 local results = telescope.run(contexts, callbacks, test_pattern)
-local summary, data = telescope.summary_report(contexts, results)
+local summary, data = telescope.summary_report(contexts, results, opts.C or opts.color)
 
 if opts.f or opts.full then
-  table.insert(buffer, telescope.test_report(contexts, results))
+  table.insert(buffer, telescope.test_report(contexts, results, opts.C or opts.color))
 end
 
 if not opts.s and not opts.silent then
