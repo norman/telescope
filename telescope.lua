@@ -163,7 +163,7 @@ local function make_assertion(name, message, func)
           error(string.format('assert_%s expected %d arguments but got %d', name, num_vars, #args))
         end
       end
-      for i = 1, nargs do a[i] = tostring(v) end
+      for i = 1, nargs do a[i] = tostring(args[i]) end
       for i = nargs+1, num_vars do a[i] = 'nil' end
       return (assertion_message_prefix .. message):format(unpack(a))
     end
